@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
@@ -11,8 +12,8 @@ public class InteractableObjectAuthoring : MonoBehaviour
         {
             var entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
 
-            // Add interactable component to object Entity
-            var obj = new InteractableObject();
+            // Add Interactable component to object Entity
+            var obj = new InteractableObject { Name = new FixedString32Bytes(authoring.ObjectData.name) };
             AddComponent(entity, obj);
 
             // Add all of the needs advertised by the object to its Entity

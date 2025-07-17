@@ -34,11 +34,6 @@ public class ExampleWorldAuthoring : MonoBehaviour
 }
 */
 
-struct ObjectDataBuffer : IBufferElementData
-{
-    public InteractableObjectData Data;
-}
-
 
 struct WorldSpawner : IComponentData
 {

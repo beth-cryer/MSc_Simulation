@@ -30,7 +30,9 @@ public partial struct NeedsDecaySystem : ISystem
         EntityCommandBuffer ecb = new(Allocator.TempJob);
 
         // Passively decay NPC needs over time
-        foreach (var (npc, needs, entity) in SystemAPI.Query<RefRW<NPC>, DynamicBuffer<NeedsBuffer>>().WithEntityAccess())
+        foreach (var (npc, needs, entity) in
+            SystemAPI.Query<RefRW<NPC>, DynamicBuffer<NeedsBuffer>>()
+            .WithEntityAccess())
         {
             DynamicBuffer<NeedsBuffer> buffer = ecb.SetBuffer<NeedsBuffer>(entity);
 
