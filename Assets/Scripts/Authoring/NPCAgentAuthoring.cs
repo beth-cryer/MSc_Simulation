@@ -9,13 +9,13 @@ public class NPCAgentAuthoring: MonoBehaviour
     {
         public override void Bake(NPCAgentAuthoring authoring)
         {
-            var entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
+            Entity entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
 
             // Add the NPC component to the Entity
-            var npc = new NPC();
+            NPC npc = new();
 
             // Initialise all of the NPC's basic Needs
-            var needs = AddBuffer<NeedsBuffer>(entity);
+            DynamicBuffer<NeedsBuffer> needs = AddBuffer<NeedsBuffer>(entity);
             needs.Add(new() { Need = { Type = ENeed.Hunger, Value = 100.0f } });
             needs.Add(new() { Need = { Type = ENeed.Sleep, Value = 100.0f } });
             needs.Add(new() { Need = { Type = ENeed.Shelter, Value = 100.0f } });

@@ -8,26 +8,29 @@ using RaycastHit = Unity.Physics.RaycastHit;
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 public partial struct NPCSelectionSystem: ISystem
 {
+    EntityQuery m_query;
+
     public void OnCreate(ref SystemState state)
-    {       
+    {
+        m_query = state.GetEntityQuery(typeof(SelectedEntityTag));
     }
 
     public void OnUpdate(ref SystemState state)
     {
         if (Input.GetMouseButtonUp(0))
         {
-            state.EntityManager.RemoveComponent<SelectedEntityTag>(state.GetEntityQuery(typeof(SelectedEntityTag)));
+            state.EntityManager.RemoveComponent<SelectedEntityTag>(m_query);
 
             var buildPhysicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-            var collisionWorld = buildPhysicsWorld.PhysicsWorld.CollisionWorld;
+            CollisionWorld collisionWorld = buildPhysicsWorld.PhysicsWorld.CollisionWorld;
 
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            var rayStart = ray.origin;
-            var rayEnd = ray.GetPoint(100f);
+            UnityEngine.Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Vector3 rayStart = ray.origin;
+            Vector3 rayEnd = ray.GetPoint(100f);
 
-            if (Raycast(collisionWorld, rayStart, rayEnd, out var raycastHit))
+            if (Raycast(collisionWorld, rayStart, rayEnd, out RaycastHit raycastHit))
             {
-                var hitEntity = buildPhysicsWorld.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex].Entity;
+                Entity hitEntity = buildPhysicsWorld.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex].Entity;
 
                 if (state.EntityManager.AddComponent<SelectedEntityTag>(hitEntity))
                 {
@@ -37,9 +40,10 @@ public partial struct NPCSelectionSystem: ISystem
         }
     }
 
+    [BurstCompile]
     private bool Raycast(CollisionWorld world, float3 rayStart, float3 rayEnd, out RaycastHit raycastHit)
     {
-        var raycastInput = new RaycastInput
+        RaycastInput raycastInput = new()
         {
             Start = rayStart,
             End = rayEnd,

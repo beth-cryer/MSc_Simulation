@@ -37,17 +37,16 @@ public partial struct NeedsDecaySystem : ISystem
             DynamicBuffer<NeedsBuffer> buffer = ecb.SetBuffer<NeedsBuffer>(entity);
 
             // For each NPC Need; decay the value and copy that to ECB, then overwrite the NPC Needs buffer using ECB
-            foreach (var need in needs)
+            foreach (NeedsBuffer need in needs)
             {
-                var alteredNeed = need;
-                alteredNeed.Need.Value = Mathf.Clamp(need.Need.Value - decayRate * SystemAPI.Time.DeltaTime, min, max);
+                Need alteredNeed = need.Need;
+                alteredNeed.Value = Mathf.Clamp(alteredNeed.Value - decayRate * SystemAPI.Time.DeltaTime, min, max);
 
-                buffer.Add(new() { Need = alteredNeed.Need });
+                buffer.Add(new() { Need = alteredNeed });
             }
         }
 
         ecb.Playback(state.EntityManager);
-
         ecb.Dispose();
     }
 }

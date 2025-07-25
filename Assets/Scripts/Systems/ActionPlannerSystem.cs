@@ -3,6 +3,7 @@ using System.Linq;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ public partial struct ActionPlannerSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-
+        state.RequireForUpdate<BlobSingleton>();
     }
 
     [BurstCompile]
@@ -22,12 +23,13 @@ public partial struct ActionPlannerSystem : ISystem
         Debug.Log("AI update tick");
 
         // Get Needs Curves from BlobAsset
-        var blobAsset = SystemAPI.GetSingleton<BlobSingleton>().BlobAssetReference;
+        BlobAssetReference<ObjectsBlobAsset> blobAsset = SystemAPI.GetSingleton<BlobSingleton>().BlobAssetReference;
 
         // Iterate over every NPC and process their action planning
-        foreach (var (npc, npcTransform, needs) in SystemAPI.Query<RefRO<NPC>, RefRO<LocalTransform>, DynamicBuffer<NeedsBuffer>>())
+        foreach (var (npc, npcTransform, needs)
+            in SystemAPI.Query<RefRO<NPC>, RefRO<LocalTransform>, DynamicBuffer<NeedsBuffer>>())
         {
-            var npcPos = npcTransform.ValueRO.Position;
+            float3 npcPos = npcTransform.ValueRO.Position;
 
             // TEMPORARY: create fixed weights list here to store object weights
             // this will need to be big enough for every InteractableObject in the game......
@@ -44,31 +46,37 @@ public partial struct ActionPlannerSystem : ISystem
                 // add (100 - NPC Need) * Need Advertised,
                 // then * result by (1/Distance)
                 float weightedValue = 0f;
-                foreach (var need in needsAdvertised)
+                foreach (NeedAdvertisementsBuffer need in needsAdvertised)
                 {
-                    // Get the current value of the Need that this is advertising from the NPC
+                    // Get the current value from the NPC of the Need that this is advertising
                     Nullable<Need> currentNeed = null;
-                    foreach (var n in needs)
+                    foreach (NeedsBuffer n in needs)
                     {
                         if (n.Need.Type == need.Need.Type)
                             currentNeed = n.Need;
                     }
                     if (currentNeed == null) continue;
 
-                    // Get the value of the Need on its Curve
                     float currentNeedValue = currentNeed.Value.Value / 100f;
                     int curveIndex = (int)(currentNeedValue * 25.0f);
-                    float curveValue = blobAsset.Value.NeedsData.ToArray()
-                        .First(n => n.Type == currentNeed.Value.Type)   //this better hit a result or we're in trouble...
-                        .Curve[curveIndex];
+                    float curveValue = 0;
+
+                    // Find the corresponding Need Curve in global data blob, and evaluate NPC's current position on the Curve
+                    for (int i = 0; i < blobAsset.Value.NeedsData.Length; i++)
+                    {
+                        if (blobAsset.Value.NeedsData[i].Type == currentNeed.Value.Type)
+                        {
+                            curveValue = blobAsset.Value.NeedsData[i].Curve[curveIndex];
+                        }
+                    }
 
                     weightedValue += curveValue;
                     //weightedValue += (100.0f - currentNeed.Value.Value) * need.Need.Value;
                 }
 
                 //Add distance from NPC
-                var targetPos = objTransform.ValueRO.Position;
-                var distance = Vector3.Distance(npcPos, targetPos);
+                float3 targetPos = objTransform.ValueRO.Position;
+                float distance = math.distance(npcPos, targetPos);
                 //todo - maybe some kind of scaling here? we probably want distance to matter less as we get to larger distances
                 // perhaps...another curve........
                 weightedValue *= (1 / distance);

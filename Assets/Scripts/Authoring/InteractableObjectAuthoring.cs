@@ -10,15 +10,18 @@ public class InteractableObjectAuthoring : MonoBehaviour
     {
         public override void Bake(InteractableObjectAuthoring authoring)
         {
-            var entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
+            Entity entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
 
             // Add Interactable component to object Entity
-            var obj = new InteractableObject { Name = new FixedString32Bytes(authoring.ObjectData.name) };
+            InteractableObject obj = new()
+            {
+                Name = new FixedString32Bytes(authoring.ObjectData.name)
+            };
             AddComponent(entity, obj);
 
             // Add all of the needs advertised by the object to its Entity
-            var needsAdvertised = AddBuffer<NeedAdvertisementsBuffer>(entity);
-            foreach (var need in authoring.ObjectData.NeedsAdvertised)
+            DynamicBuffer<NeedAdvertisementsBuffer> needsAdvertised = AddBuffer<NeedAdvertisementsBuffer>(entity);
+            foreach (Need need in authoring.ObjectData.NeedsAdvertised)
             {
                 needsAdvertised.Add(new() { Need = need });
             }

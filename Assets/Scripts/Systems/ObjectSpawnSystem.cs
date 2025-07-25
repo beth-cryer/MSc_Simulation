@@ -13,15 +13,18 @@ public partial struct ObjectSpawnSystem : ISystem
     {
         state.Enabled = false; //this means spawn will only run once on startup
 
-        foreach (var (spawner, data) in SystemAPI.Query<RefRO<WorldSpawner>, DynamicBuffer<NeedsBuffer>>())
+        foreach (var (spawner, data)
+            in SystemAPI.Query<RefRO<WorldSpawner>, DynamicBuffer<NeedsBuffer>>())
         {
-            var instances = state.EntityManager.Instantiate(spawner.ValueRO.ObjectPrefab, data.Length, Allocator.Temp);
+            NativeArray<Entity> instances = state.EntityManager.Instantiate(spawner.ValueRO.ObjectPrefab, data.Length, Allocator.Temp);
 
+            /*
             for (int i = 0; i < instances.Length; i++)
             {
                 var obj = SystemAPI.GetComponentRW<InteractableObject>(instances[i]);
-                //obj.ValueRW.Data = data[i].Need;
+                obj.ValueRW.Data = data[i].Need;
             }
+            */
         }
 
 

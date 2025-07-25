@@ -10,8 +10,8 @@ public class SpawnerAuthoring : MonoBehaviour
     {
         public override void Bake(SpawnerAuthoring authoring)
         {
-            var entity = GetEntity(authoring, TransformUsageFlags.None);
-            var spawner = new Spawner
+            Entity entity = GetEntity(authoring, TransformUsageFlags.None);
+            Spawner spawner = new()
             {
                 NPCPrefab = GetEntity(authoring.NPCPrefab, TransformUsageFlags.Dynamic),
                 SpawnAmount = authoring.SpawnAmount

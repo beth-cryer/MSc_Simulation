@@ -19,10 +19,10 @@ public partial struct SpawnSystem : ISystem
         state.Enabled = false; //this means spawn will only run once on startup
 
         var npc = SystemAPI.GetSingleton<Spawner>();
-        var instances = state.EntityManager.Instantiate(npc.NPCPrefab, npc.SpawnAmount, Allocator.Temp);
+        NativeArray<Entity> instances = state.EntityManager.Instantiate(npc.NPCPrefab, npc.SpawnAmount, Allocator.Temp);
 
-        var random = new Random(123);
-        foreach (var entity in instances)
+        Random random = new(123);
+        foreach (Entity entity in instances)
         {
             var transform = SystemAPI.GetComponentRW<LocalTransform>(entity);
             transform.ValueRW.Position = random.NextFloat3(new float3(10, 10, 0)) - new float3(5, 5, 0);

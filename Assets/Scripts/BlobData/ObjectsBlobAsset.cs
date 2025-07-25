@@ -11,6 +11,7 @@ public struct NeedsData: IComponentData
 {
     public ENeed Type;
     public BlobArray<float> Curve;
+    public int DecayRate;
 }
 
 public struct ObjectsBlobData: IComponentData
