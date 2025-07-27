@@ -25,6 +25,10 @@ public class InteractableObjectAuthoring : MonoBehaviour
             {
                 needsAdvertised.Add(new() { Need = need });
             }
+
+            // Set object sprite
+            var renderer = GetComponent<SpriteRenderer>();
+            renderer.sprite = authoring.ObjectData.Sprite;
         }
     }
 }

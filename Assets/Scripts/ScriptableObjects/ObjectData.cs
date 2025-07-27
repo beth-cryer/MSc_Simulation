@@ -4,5 +4,6 @@ using UnityEngine;
 public class ObjectData: ScriptableObject
 {
     public string Name;
+    public Sprite Sprite;
     public Need[] NeedsAdvertised;
 }

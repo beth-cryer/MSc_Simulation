@@ -12,7 +12,11 @@ public class NPCAgentAuthoring: MonoBehaviour
             Entity entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
 
             // Add the NPC component to the Entity
-            NPC npc = new();
+            NPC npc = new()
+            {
+                Name = "ExampleName",
+                Speed = 5.0f
+            };
 
             // Initialise all of the NPC's basic Needs
             DynamicBuffer<NeedsBuffer> needs = AddBuffer<NeedsBuffer>(entity);

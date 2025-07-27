@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2eeebd0ed8580ba4585641ca9b7c0a89, type: 3}
   m_Name: Object_Meal
   m_EditorClassIdentifier: 
-  Data:
-    NeedsAdvertised:
-      Hunger: 100
-      Shelter: 0
-      Sleep: 0
-      Social: 0
+  Name: Food
+  Sprite: {fileID: 21300000, guid: da04b3619f4986641b104c4f48eaefbf, type: 3}
+  NeedsAdvertised:
+  - Type: 0
+    Value: 50

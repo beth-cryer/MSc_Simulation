@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2eeebd0ed8580ba4585641ca9b7c0a89, type: 3}
   m_Name: Object_Bed
   m_EditorClassIdentifier: 
+  Name: Bed
+  Sprite: {fileID: 21300000, guid: 037473db61fe96d40a7ff964d5d28fd8, type: 3}
   NeedsAdvertised:
   - Type: 2
     Value: 100

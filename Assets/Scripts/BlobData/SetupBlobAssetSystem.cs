@@ -39,10 +39,6 @@ public partial struct SetupBlobAssetSystem : ISystem
             BlobBuilderArray<float> curve = blobBuilder.Allocate(ref needsArray[i].Curve, sampleSize);
             AnimationCurveToArray(new AnimationCurve(), ref curve, sampleSize);
         }
-        needsArray[0] = new()
-        {
-            Type = ENeed.Hunger
-        };
 
         // Add Blob Data to Singleton so it can be accessed by systems
         BlobSingleton blobSingleton = SystemAPI.GetSingleton<BlobSingleton>();

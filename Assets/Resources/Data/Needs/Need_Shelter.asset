@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fea011a6385c3e442bc1bbd90952be1d, type: 3}
   m_Name: Need_Shelter
   m_EditorClassIdentifier: 
+  Name: Shelter
   Type: 1
   Curve:
     serializedVersion: 2
