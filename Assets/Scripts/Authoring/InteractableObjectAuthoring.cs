@@ -16,7 +16,7 @@ public class InteractableObjectAuthoring : MonoBehaviour
             // Add Interactable component to object Entity
             InteractableObject obj = new()
             {
-                Name = new FixedString32Bytes(authoring.ObjectData.name),
+                Name = new FixedString32Bytes(authoring.ObjectData.Name),
                 InteractDuration = authoring.ObjectData.InteractDuration,
             };
             AddComponent(entity, obj);

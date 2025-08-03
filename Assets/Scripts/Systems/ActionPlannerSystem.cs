@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 // Lot of nested iteration over all entities happens here, so we limit it to a less frequent tick rate
 [UpdateInGroup(typeof(ActionRefreshSystemGroup))]
@@ -14,6 +15,7 @@ public partial struct ActionPlannerSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<BlobSingleton>();
+        state.RequireForUpdate<RandomSingleton>();
     }
 
     [BurstCompile]
@@ -23,6 +25,7 @@ public partial struct ActionPlannerSystem : ISystem
 
         // Get Needs Curves from BlobAsset
         BlobAssetReference<ObjectsBlobAsset> blobAsset = SystemAPI.GetSingleton<BlobSingleton>().BlobAssetReference;
+        var randomSingleton = SystemAPI.GetSingletonRW<RandomSingleton>();
 
         EntityCommandBuffer ecb = new(Allocator.TempJob);
 
@@ -57,37 +60,55 @@ public partial struct ActionPlannerSystem : ISystem
                     //  NeedRange - Abs(Distance between Mood values) * Intensity
 
                     // Get the current value from the NPC of the Need that this is advertising
-                    Nullable<Need> currentNeed = null;
-                    foreach (NeedBuffer n in needs)
+                    int n = 0;
+                    foreach (NeedBuffer findNeed in needs)
                     {
-                        if (n.Need.Type == needAdvertised.NeedAdvertised.Type)
-                            currentNeed = n.Need;
+                        if (findNeed.Need.Type == needAdvertised.NeedAdvertised.Type)
+                        {
+                            break;
+                        }
+                        n++;
                     }
-                    if (currentNeed == null) continue;
+                    if (n > needs.Length) continue;
 
                     // Find the corresponding Need Curve in global data blob, and evaluate NPC's current position on the Curve
                     float curveValue = 1.0f;
                     for (int i = 0; i < blobAsset.Value.NeedsData.Length; i++)
                     {
-                        if (blobAsset.Value.NeedsData[i].Type == currentNeed.Value.Type)
+                        if (blobAsset.Value.NeedsData[i].Type == needs[i].Need.Type)
                         {
-                            // (100 - need) / 100
-                            float3 currentNeedValue = math.clamp(
-                                (blobAsset.Value.NeedsData[i].MaxValue - currentNeed.Value.Value) / blobAsset.Value.NeedsData[i].MaxValue,
-                                0, 1);
-                            int curveIndex = (int)(currentNeedValue[0] * 25.0f);
+                            // (needMax - need) / needMax
+                            float currentNeedValue = math.clamp(
+                                (blobAsset.Value.NeedsData[i].MaxValue - needs[i].Need.Value) / blobAsset.Value.NeedsData[i].MaxValue,
+                                0f, 1f)[0];
+                            int curveIndex = (int)math.round(currentNeedValue * 25f);
                             curveValue = blobAsset.Value.NeedsData[i].Curve[curveIndex];
+                            //Debug.Log(string.Format("currentNeedValue = {0}", currentNeedValue));
+                            //Debug.Log(string.Format("curveValue = {0}", curveValue));
                             break;
                         }
                     }
 
+                    /* Value without Curve applied
+                     * 
+                    float curveValue = 1.0f;
+                    for (int i = 0; i < blobAsset.Value.NeedsData.Length; i++)
+                    {
+                        if (blobAsset.Value.NeedsData[i].Type == needs[i].Need.Type)
+                        {
+                            curveValue = math.clamp(
+                                (blobAsset.Value.NeedsData[i].MaxValue - needs[i].Need.Value) / blobAsset.Value.NeedsData[i].MaxValue,
+                                0f, 1f)[0];
+                            break;
+                        }
+                    }*/
+
                     weightedValue += curveValue * needAdvertised.NeedAdvertised.Value[0];
-                    //weightedValue += (100.0f - currentNeed.Value.Value) * needAdvertised.NeedAdvertised.Value;
                 }
 
                 // Add distance from NPC
                 float3 targetPos = objTransform.ValueRO.Position;
-                float distance = math.distance(npcPos, targetPos);
+                float distance = math.max(math.distance(npcPos, targetPos), 0.1f); //don't allow division by 0
                 //todo - maybe some kind of scaling here? we probably want distance to matter less as we get to larger distances
                 // perhaps...another curve, hmm?........
                 weightedValue *= (1 / distance);
@@ -104,12 +125,14 @@ public partial struct ActionPlannerSystem : ISystem
                 weightCount++;
             }
 
-            Debug.Log(string.Format("checked {0} possibilites", weightCount));
+            //Debug.Log(string.Format("checked {0} possibilites", weightCount));
 
             // Randomly pick from weighted list
-            int randomIndex = PickWeightedValue(ref weights, sumOfWeights);
+            int randomIndex = PickWeightedValue(ref randomSingleton.ValueRW, ref weights, weightCount, sumOfWeights);
 
-            ActionPathfind pathfind = new() { Destination = weights[randomIndex].Position };
+            ActionPathfind pathfind = new() {
+                Destination = weights[randomIndex].Position,
+            };
             ecb.AddComponent(npcEntity, pathfind);  // note: AddComponent overwrites existing component if there is one
 
             ActionSetNeed action = new() {
@@ -139,14 +162,14 @@ public partial struct ActionPlannerSystem : ISystem
     }
 
     [BurstCompile]
-    private readonly int PickWeightedValue(ref NativeArray<WeightedAction> weights, float sumOfWeights)
+    private readonly int PickWeightedValue(ref RandomSingleton random, ref NativeArray<WeightedAction> weights, int weightCount, float sumOfWeights)
     {
-        float random = UnityEngine.Random.Range(0, sumOfWeights);
-        for (int i = 0; i < weights.Length; i++)
+        float r = random.Random.NextFloat() * sumOfWeights;
+        for (int i = 0; i < weightCount; i++)
         {
-            if (random < weights[i].Weight)
+            if (r < weights[i].Weight)
                 return i;
-            random -= weights[i].Weight;
+            r -= weights[i].Weight;
         }
 
         return 0;

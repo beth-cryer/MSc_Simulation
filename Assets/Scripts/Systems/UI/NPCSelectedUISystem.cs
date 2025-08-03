@@ -15,11 +15,20 @@ public partial struct NPCSelectedUISystem : ISystem
                 needsList.Add(needs[i].Need);
 
             string goal  = "None";
-            if (SystemAPI.HasComponent<ActionSetNeed>(entity))
-                goal = "Interacting with some object lol";
+            string interactableName = "?";
 
-            if (SystemAPI.HasComponent<ActionPathfind>(entity))
-                goal = "Pathfinding";
+            // Find object we are interacting with
+            if (SystemAPI.HasComponent<ActionSetNeed>(entity))
+            {
+                var action = SystemAPI.GetComponent<ActionSetNeed>(entity);
+                interactableName = SystemAPI.GetComponent<InteractableObject>(action.InteractingObject).Name.ToString();
+
+                // Either moving to the object or performing the action
+                if (SystemAPI.HasComponent<ActionPathfind>(entity))
+                    goal = string.Format("Moving to {0}", interactableName);
+                else
+                    goal = string.Format("Interacting with {0}", interactableName);
+            }
 
             SelectedEntityUI.Instance.UpdateUI(npc.ValueRO, needsList, goal);
         }

@@ -8,6 +8,7 @@ public interface IActionComponent
 
 public struct ActionPathfind : IComponentData, IActionComponent
 {
-    public bool DestinationReached;
     public float3 Destination;
+    public Entity DestinationEntity;
+    public bool DestinationReached;
 }

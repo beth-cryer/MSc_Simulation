@@ -37,7 +37,7 @@ public class BlobAuthoring: MonoBehaviour
                 // We'll sample at a fidelity of 25, so every 4 steps in the curve
                 int sampleSize = 25;
                 BlobBuilderArray<float> curve = blobBuilder.Allocate(ref needsArray[i].Curve, sampleSize + 1);
-                AnimationCurveToArray(new AnimationCurve(), ref curve, sampleSize);
+                AnimationCurveToArray(NeedData[i].Curve, ref curve, sampleSize);
             }
 
             // Add Blob Data to Singleton so it can be accessed by systems
