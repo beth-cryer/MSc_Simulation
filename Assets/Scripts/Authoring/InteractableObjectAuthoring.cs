@@ -1,10 +1,11 @@
+using NaughtyAttributes;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
 public class InteractableObjectAuthoring : MonoBehaviour
 {
-    [SerializeField] private ObjectData ObjectData;
+    [SerializeField] [Expandable] private ObjectData ObjectData;
 
     class InteractableObjectBaker : Baker<InteractableObjectAuthoring>
     {
@@ -15,15 +16,21 @@ public class InteractableObjectAuthoring : MonoBehaviour
             // Add Interactable component to object Entity
             InteractableObject obj = new()
             {
-                Name = new FixedString32Bytes(authoring.ObjectData.name)
+                Name = new FixedString32Bytes(authoring.ObjectData.name),
+                InteractDuration = authoring.ObjectData.InteractDuration,
             };
             AddComponent(entity, obj);
 
             // Add all of the needs advertised by the object to its Entity
-            DynamicBuffer<NeedAdvertisementsBuffer> needsAdvertised = AddBuffer<NeedAdvertisementsBuffer>(entity);
-            foreach (Need need in authoring.ObjectData.NeedsAdvertised)
+            DynamicBuffer<NeedAdvertisementBuffer> needsAdvertised = AddBuffer<NeedAdvertisementBuffer>(entity);
+            foreach (NeedAdvertisedData need in authoring.ObjectData.NeedsAdvertised)
             {
-                needsAdvertised.Add(new() { Need = need });
+                needsAdvertised.Add(new()
+                {
+                    NeedAdvertised = need.NeedAdvertised,
+                    ActionType = need.ActionType,
+                    MoveTowardsAmount = need.MoveTowardsAmount,
+                });
             }
 
             // Set object sprite

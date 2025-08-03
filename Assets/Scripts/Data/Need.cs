@@ -1,11 +1,12 @@
 using System;
 using Unity.Entities;
+using Unity.Mathematics;
 
 [Serializable]
 public struct Need
 {
     public ENeed Type;
-    public float Value;
+    public float3 Value;
 }
 
 public enum ENeed
@@ -13,17 +14,21 @@ public enum ENeed
     Hunger,
     Shelter,
     Sleep,
-    Social
+    Social,
+    Mood
 }
 
-[InternalBufferCapacity(4)]
-public struct NeedsBuffer : IBufferElementData
+[InternalBufferCapacity(8)]
+public struct NeedBuffer : IBufferElementData
 {
     public Need Need;
 }
 
-[InternalBufferCapacity(4)]
-public struct NeedAdvertisementsBuffer : IBufferElementData
+[InternalBufferCapacity(8)]
+public struct NeedAdvertisementBuffer : IBufferElementData
 {
-    public Need Need;
+    public Need NeedAdvertised;
+    public EActionType ActionType;
+    public float3 MoveTowardsAmount;
+    public float InteractDuration;
 }

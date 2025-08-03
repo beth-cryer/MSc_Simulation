@@ -103,13 +103,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NeedsAdvertised:
   - Type: 0
-    Value: 0
-  - Type: 0
-    Value: 0
-  - Type: 0
-    Value: 0
-  - Type: 0
-    Value: 0
+    Value:
+      x: 100
+      y: 0
+      z: 0
+  - Type: 1
+    Value:
+      x: 100
+      y: 0
+      z: 0
+  - Type: 2
+    Value:
+      x: 100
+      y: 0
+      z: 0
+  - Type: 3
+    Value:
+      x: 100
+      y: 0
+      z: 0
 --- !u!114 &6775625976555071204
 MonoBehaviour:
   m_ObjectHideFlags: 0

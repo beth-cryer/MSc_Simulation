@@ -14,26 +14,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Sleep
   Type: 2
+  MinValue:
+    x: 0
+    y: 0
+    z: 0
+  ZeroValue:
+    x: 0
+    y: 0
+    z: 0
+  MaxValue:
+    x: 100
+    y: 100
+    z: 100
+  DecayRate:
+    x: 0.5
+    y: 0.5
+    z: 0.5
+  IsVisibleNeed: 1
   Curve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
+      inSlope: 0.36472303
+      outSlope: 0.36472303
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.058753
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
+      inSlope: 3.610393
+      outSlope: 3.610393
+      tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.02637887
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

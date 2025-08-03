@@ -1,5 +1,6 @@
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 
 public struct ObjectsBlobAsset
 {
@@ -9,12 +10,15 @@ public struct ObjectsBlobAsset
 
 public struct NeedsData: IComponentData
 {
-    public ENeed Type;
     public BlobArray<float> Curve;
-    public int DecayRate;
+    public float3 MinValue;
+    public float3 ZeroValue;
+    public float3 MaxValue;
+    public float3 DecayRate;
+    public ENeed Type;
 }
 
 public struct ObjectsBlobData: IComponentData
 {
-    public FixedString64Bytes ExampleData;
+    public FixedString32Bytes ExampleData;
 }

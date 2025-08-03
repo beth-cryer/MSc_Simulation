@@ -3,19 +3,27 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
+/*
 public partial struct SetupBlobAssetSystem : ISystem
 {
+    BlobAssetReference<ObjectsBlobAsset> blobAssetReference;
+
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<BlobSingleton>();
+    }
+
+    [BurstCompile]
+    public void OnDestroy(ref SystemState state)
+    {
+        blobAssetReference.Dispose();
     }
 
     public void OnUpdate(ref SystemState state)
     {
         state.Enabled = false;
 
-        using BlobBuilder blobBuilder = new(Allocator.Temp);
+        BlobBuilder blobBuilder = new(Allocator.Temp);
         ref ObjectsBlobAsset blobAsset = ref blobBuilder.ConstructRoot<ObjectsBlobAsset>();
         BlobBuilderArray<ObjectsBlobData> objectArray = blobBuilder.Allocate(ref blobAsset.Array, 3);
 
@@ -32,18 +40,29 @@ public partial struct SetupBlobAssetSystem : ISystem
         // Populate Blob Data with Needs and generate arrays from curves
         for (int i = 0; i < NeedData.Length; i++)
         {
-            needsArray[i] = new() { Type = NeedData[i].Type };
+            needsArray[i] = new()
+            {
+                Type = NeedData[i].Type,
+                MinValue = NeedData[i].MinValue,
+                ZeroValue = NeedData[i].ZeroValue,
+                MaxValue = NeedData[i].MaxValue,
+                DecayRate = NeedData[i].DecayRate,
+            };
 
             // We'll sample at a fidelity of 25, so every 4 steps in the curve
             int sampleSize = 25;
-            BlobBuilderArray<float> curve = blobBuilder.Allocate(ref needsArray[i].Curve, sampleSize);
+            BlobBuilderArray<float> curve = blobBuilder.Allocate(ref needsArray[i].Curve, sampleSize+1);
             AnimationCurveToArray(new AnimationCurve(), ref curve, sampleSize);
         }
 
         // Add Blob Data to Singleton so it can be accessed by systems
+        state.EntityManager.CreateSingleton<BlobSingleton>();
         BlobSingleton blobSingleton = SystemAPI.GetSingleton<BlobSingleton>();
-        blobSingleton.BlobAssetReference = blobBuilder.CreateBlobAssetReference<ObjectsBlobAsset>(Allocator.Persistent);
+        blobAssetReference = blobBuilder.CreateBlobAssetReference<ObjectsBlobAsset>(Allocator.Persistent);
+        blobSingleton.BlobAssetReference = blobAssetReference;
         SystemAPI.SetSingleton(blobSingleton);
+
+        blobBuilder.Dispose();
     }
 
     // NOTE: SAMPLE SIZE MUST BE MULTIPLE OF 100
@@ -59,3 +78,4 @@ public partial struct SetupBlobAssetSystem : ISystem
         }
     }
 }
+*/

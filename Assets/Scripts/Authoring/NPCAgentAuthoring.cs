@@ -18,12 +18,18 @@ public class NPCAgentAuthoring: MonoBehaviour
                 Speed = 5.0f
             };
 
-            // Initialise all of the NPC's basic Needs
-            DynamicBuffer<NeedsBuffer> needs = AddBuffer<NeedsBuffer>(entity);
-            needs.Add(new() { Need = { Type = ENeed.Hunger, Value = 100.0f } });
-            needs.Add(new() { Need = { Type = ENeed.Sleep, Value = 100.0f } });
-            needs.Add(new() { Need = { Type = ENeed.Shelter, Value = 100.0f } });
-            needs.Add(new() { Need = { Type = ENeed.Social, Value = 100.0f } });
+            DynamicBuffer<NeedBuffer> needs = AddBuffer<NeedBuffer>(entity);
+            foreach (var need in authoring.NeedsAdvertised)
+            {
+                needs.Add(new()
+                {
+                    Need =
+                    {
+                        Type = need.Type,
+                        Value = need.Value,
+                    }
+                });
+            }
 
             AddComponent(entity, npc);
         }

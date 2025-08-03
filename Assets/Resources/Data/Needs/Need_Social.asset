@@ -14,35 +14,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Social
   Type: 3
+  MinValue:
+    x: 0
+    y: 0
+    z: 0
+  ZeroValue:
+    x: 0
+    y: 0
+    z: 0
+  MaxValue:
+    x: 100
+    y: 100
+    z: 100
+  DecayRate:
+    x: 0.5
+    y: 0.5
+    z: 0.5
+  IsVisibleNeed: 1
   Curve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.5
+      value: 0.25
       inSlope: -0.90259737
-      outSlope: -0.90259737
-      tangentMode: 0
+      outSlope: 0
+      tangentMode: 65
       weightedMode: 0
       inWeight: 0
       outWeight: 0.052757792
     - serializedVersion: 3
       time: 0.5
       value: 0.25
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 34
+      inSlope: -0
+      outSlope: 0.07971981
+      tangentMode: 5
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
+      inWeight: 0.17840594
+      outWeight: 0.288177
     - serializedVersion: 3
       time: 1
       value: 0.5
-      inSlope: 0.9679258
-      outSlope: 0.9679258
-      tangentMode: 0
+      inSlope: 0.7913341
+      outSlope: 0.00644714
+      tangentMode: 65
       weightedMode: 0
-      inWeight: 0.13804281
+      inWeight: 0.07443714
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

@@ -1,13 +1,14 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public partial struct NeedsDecaySystem : ISystem
 {
-    float min, max;
-    float decayRate;
+    float3 min, max;
+    float3 decayRate;
 
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -30,16 +31,16 @@ public partial struct NeedsDecaySystem : ISystem
 
         // Passively decay NPC needs over time
         foreach (var (npc, needs, entity) in
-            SystemAPI.Query<RefRW<NPC>, DynamicBuffer<NeedsBuffer>>()
+            SystemAPI.Query<RefRW<NPC>, DynamicBuffer<NeedBuffer>>()
             .WithEntityAccess())
         {
-            DynamicBuffer<NeedsBuffer> buffer = ecb.SetBuffer<NeedsBuffer>(entity);
+            DynamicBuffer<NeedBuffer> buffer = ecb.SetBuffer<NeedBuffer>(entity);
 
             // For each NPC Need; decay the value and copy that to ECB, then overwrite the NPC Needs buffer using ECB
-            foreach (NeedsBuffer need in needs)
+            foreach (NeedBuffer need in needs)
             {
                 Need alteredNeed = need.Need;
-                alteredNeed.Value = Mathf.Clamp(alteredNeed.Value - decayRate * SystemAPI.Time.DeltaTime, min, max);
+                alteredNeed.Value = math.clamp(alteredNeed.Value - decayRate * SystemAPI.Time.DeltaTime, min, max);
 
                 buffer.Add(new() { Need = alteredNeed });
             }

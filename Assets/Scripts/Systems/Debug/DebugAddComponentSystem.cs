@@ -25,7 +25,13 @@ public partial struct DebugAddComponentSystem : ISystem
                     Destination = new float3(10, 10, 10)
                 };
 
-                ecb.AddComponent<ActionPathfind>(entity, pathfind);
+                ActionSetNeed action = new()
+                {
+
+                };
+
+                ecb.AddComponent(entity, pathfind);
+                ecb.AddComponent(entity, action);
             }
 
             ecb.Playback(state.EntityManager);
