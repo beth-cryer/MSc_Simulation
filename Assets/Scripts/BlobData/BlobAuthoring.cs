@@ -25,7 +25,7 @@ public class BlobAuthoring: MonoBehaviour
             // Populate Blob Data with Needs and generate arrays from curves
             for (int i = 0; i < NeedData.Length; i++)
             {
-                needsArray[i] = new()
+                needsArray[(int)NeedData[i].Type] = new()
                 {
                     Type = NeedData[i].Type,
                     MinValue = NeedData[i].MinValue,

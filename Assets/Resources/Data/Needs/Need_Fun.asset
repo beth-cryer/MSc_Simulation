@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fea011a6385c3e442bc1bbd90952be1d, type: 3}
-  m_Name: Need_Sleep
+  m_Name: Need_Fun
   m_EditorClassIdentifier: 
-  Name: Sleep
-  Type: 2
+  Name: Fun
+  Type: 5
   MinValue:
     x: 0
     y: 0
@@ -27,30 +27,39 @@ MonoBehaviour:
     y: 0
     z: 0
   DecayRate:
-    x: 0.5
-    y: 0.5
-    z: 0.5
+    x: 2
+    y: 2
+    z: 2
   IsVisibleNeed: 1
   Curve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.1
-      inSlope: 0.36472303
-      outSlope: 0.36472303
-      tangentMode: 0
+      value: 0.25
+      inSlope: -0.90259737
+      outSlope: 0
+      tangentMode: 65
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.058753
+      outWeight: 0.052757792
+    - serializedVersion: 3
+      time: 0.5
+      value: 0.25
+      inSlope: -0
+      outSlope: 0.07971981
+      tangentMode: 5
+      weightedMode: 0
+      inWeight: 0.17840594
+      outWeight: 0.288177
     - serializedVersion: 3
       time: 1
-      value: 1
-      inSlope: 3.610393
-      outSlope: 3.610393
-      tangentMode: 0
+      value: 0.5
+      inSlope: 0.7913341
+      outSlope: 0.00644714
+      tangentMode: 65
       weightedMode: 0
-      inWeight: 0.02637887
+      inWeight: 0.07443714
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

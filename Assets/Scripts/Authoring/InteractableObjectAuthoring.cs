@@ -17,7 +17,6 @@ public class InteractableObjectAuthoring : MonoBehaviour
             InteractableObject obj = new()
             {
                 Name = new FixedString32Bytes(authoring.ObjectData.Name),
-                InteractDuration = authoring.ObjectData.InteractDuration,
             };
             AddComponent(entity, obj);
 
@@ -29,11 +28,15 @@ public class InteractableObjectAuthoring : MonoBehaviour
                 {
                     NeedAdvertised = need.NeedAdvertised,
                     ActionType = need.ActionType,
-                    MoveTowardsAmount = need.MoveTowardsAmount,
+                    NeedValueChange = need.NeedValueChange,
+                    InteractDuration = need.InteractDuration,
+                    RequiredToCompleteAction = need.RequiredToCompleteAction,
                 });
             }
 
             // Set object sprite
+            if (authoring.ObjectData.Sprite == null)
+                return;
             var renderer = GetComponent<SpriteRenderer>();
             renderer.sprite = authoring.ObjectData.Sprite;
         }

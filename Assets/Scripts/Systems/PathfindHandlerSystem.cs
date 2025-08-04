@@ -15,7 +15,7 @@ public partial struct PathfindHandlerSystem : ISystem
 
         // Pathfinding
         foreach (var (npc, npcTransform, pathfinding, action, entity)
-            in SystemAPI.Query<RefRO<NPC>, RefRW<LocalTransform>, RefRW<ActionPathfind>, RefRO<ActionSetNeed>>()
+            in SystemAPI.Query<RefRO<NPC>, RefRW<LocalTransform>, RefRW<ActionPathfind>, RefRO<QueuedAction>>()
             .WithEntityAccess())
         {
             if (pathfinding.ValueRO.DestinationReached)
@@ -30,12 +30,12 @@ public partial struct PathfindHandlerSystem : ISystem
             {
                 ecb.RemoveComponent<ActionPathfind>(entity);
 
-                if (action.ValueRO.InteractingObject == Entity.Null)
+                if (action.ValueRO.InteractionObject == Entity.Null)
                     continue;
-                // If the target already has InUse component, remove this entity's Action (someone else got there first)
-                if (SystemAPI.HasComponent<InUseTag>(action.ValueRO.InteractingObject))
+                // If the target already has InUse component, remove this entity's QueuedAction components (someone else got there first)
+                if (SystemAPI.HasComponent<InUseTag>(action.ValueRO.InteractionObject))
                 {
-                    ecb.RemoveComponent<ActionSetNeed>(entity);
+                    ecb.RemoveComponent<QueuedAction>(entity);
                     continue;
                 }
 
@@ -47,12 +47,9 @@ public partial struct PathfindHandlerSystem : ISystem
                 // Action Planner will ignore it until it is no longer in use
 
                 InUseTag inUse = new() { InteractingNPC = entity };
-                ecb.AddComponent(action.ValueRO.InteractingObject, inUse);
+                ecb.AddComponent(action.ValueRO.InteractionObject, inUse);
 
-                Interaction npcIsInteracting = new() {
-                    InteractionObject = action.ValueRO.InteractingObject,
-                    InteractDuration = action.ValueRO.Duration,
-                };
+                Interaction npcIsInteracting = new() { InteractionObject = action.ValueRO.InteractionObject };
                 ecb.AddComponent(entity, npcIsInteracting);
 
                 // (AddComponent won't replace an existing component, so if there does end up being an InUseTag already it's fine_

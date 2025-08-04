@@ -15,7 +15,8 @@ public enum ENeed
     Shelter,
     Sleep,
     Social,
-    Mood
+    Mood,
+    Fun,
 }
 
 [InternalBufferCapacity(8)]
@@ -29,6 +30,7 @@ public struct NeedAdvertisementBuffer : IBufferElementData
 {
     public Need NeedAdvertised;
     public EActionType ActionType;
-    public float3 MoveTowardsAmount;
+    public float3 NeedValueChange;
     public float InteractDuration;
+    public bool RequiredToCompleteAction;
 }

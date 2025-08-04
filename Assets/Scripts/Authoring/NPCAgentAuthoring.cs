@@ -14,7 +14,7 @@ public class NPCAgentAuthoring: MonoBehaviour
             // Add the NPC component to the Entity
             NPC npc = new()
             {
-                Name = "ExampleName",
+                Name = string.Format("NPC #{0}", entity.Index),
                 Speed = 5.0f
             };
 

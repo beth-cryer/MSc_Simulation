@@ -24,12 +24,12 @@ MonoBehaviour:
     z: 0
   MaxValue:
     x: 100
-    y: 100
-    z: 100
+    y: 0
+    z: 0
   DecayRate:
-    x: 0.5
-    y: 0.5
-    z: 0.5
+    x: 1
+    y: 1
+    z: 1
   IsVisibleNeed: 1
   Curve:
     serializedVersion: 2

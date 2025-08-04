@@ -14,6 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Shelter
   Type: 1
+  MinValue:
+    x: 0
+    y: 0
+    z: 0
+  ZeroValue:
+    x: 0
+    y: 0
+    z: 0
+  MaxValue:
+    x: 100
+    y: 0
+    z: 0
+  DecayRate:
+    x: 1
+    y: 1
+    z: 1
+  IsVisibleNeed: 1
   Curve:
     serializedVersion: 2
     m_Curve:

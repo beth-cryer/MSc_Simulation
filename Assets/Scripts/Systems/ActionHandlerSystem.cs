@@ -2,7 +2,6 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using static UnityEngine.GraphicsBuffer;
 
 // Look for NPC Entities with an Action component and execute those actions
 
@@ -21,8 +20,8 @@ public partial struct ActionHandlerSystem : ISystem
         BlobAssetReference<ObjectsBlobAsset> blobAsset = SystemAPI.GetSingleton<BlobSingleton>().BlobAssetReference;
         EntityCommandBuffer ecb = new(Allocator.TempJob);
 
-        foreach (var (npc, needs, actionLabel, action, interaction, entity) in
-            SystemAPI.Query<RefRO<NPC>, DynamicBuffer<NeedBuffer>, RefRO<ActionSetNeed>, DynamicBuffer<InteractionBuffer>, RefRW<Interaction>>()
+        foreach (var (npc, needs, actions, interaction, entity) in
+            SystemAPI.Query<RefRO<NPC>, DynamicBuffer<NeedBuffer>, DynamicBuffer<InteractionBuffer>, RefRW<Interaction>>()
             .WithNone<ActionPathfind>()
             .WithEntityAccess())
         {
@@ -41,66 +40,53 @@ public partial struct ActionHandlerSystem : ISystem
                 newNeeds.Add(new() { Need = needs[i].Need });
             }
 
-            bool isTargetNeedsValuesReached = true; // if there are any needs that aren't at target, we'll set this to false
+            // Action is finished if we have reached the target value or time has elapsed
+            // for all Needs which are RequiredToCompleteAction
+            bool isActionFinished = true; // if there are any needs that aren't at target, we'll set this to false
 
             // Move need towards target value gradually
-            foreach (InteractionBuffer actionBuffer in action)
+            foreach (InteractionBuffer actionBuffer in actions)
             {
-                if (actionBuffer.ActionType == EActionType.MoveTowards)
+                if (actionBuffer.RequiredToCompleteAction && !actionBuffer.Complete)
+                    isActionFinished = false;
+
+                if (actionBuffer.Complete)
+                    break;
+
+                switch (actionBuffer.ActionType)
                 {
-                    for (int i = 0; i < newNeeds.Length; i++)
-                    {
-                        if (newNeeds[i].Need.Type == actionBuffer.NeedAction.Type)
+                    case (EActionType.ModifyNeed):
+                        for (int n = 0; n < newNeeds.Length; n++)
                         {
-                            Need alteredNeed = newNeeds[i].Need;
-                            float3 current = newNeeds[i].Need.Value;
-                            float3 target = actionBuffer.NeedAction.Value;
-
-                            if (math.distance(current,target) > 0.01f)
-                                isTargetNeedsValuesReached = false;
-
-                            // If MoveTowardsAmount is set, use that value as the stepAmount-
-                            if (!actionBuffer.MoveTowardsAmount.Equals(float3.zero))
+                            if (newNeeds[n].Need.Type == actionBuffer.NeedAction.Type)
                             {
-                                float stepAmount = actionBuffer.MoveTowardsAmount[0] * SystemAPI.Time.DeltaTime;
-                                MathHelpers.MoveTowards(ref current, ref target, stepAmount, out alteredNeed.Value);
+                                Need alteredNeed = newNeeds[n].Need;
+                                float3 current = newNeeds[n].Need.Value;
+                                float3 target = actionBuffer.NeedAction.Value;
+
+                                ref var needData = ref blobAsset.Value.NeedsData[(int)alteredNeed.Type];
+
+                                alteredNeed.Value = math.clamp(alteredNeed.Value + actionBuffer.NeedValueChange * SystemAPI.Time.DeltaTime,
+                                    needData.MinValue,
+                                    needData.MaxValue);
+
+                                if (interaction.ValueRO.TimeElapsed >= actionBuffer.InteractDuration
+                                    || math.all(alteredNeed.Value == needData.MaxValue)
+                                    || math.all(alteredNeed.Value == needData.MinValue))
+                                {
+                                    // Set as complete in InteractionBuffer
+                                    SetComplete(ref ecb, entity, actions, actionBuffer);
+                                }
+
+                                newNeeds[n] = new() { Need = alteredNeed };
                             }
-                            else
-                            // Else: calculate amount to step to get from startValue to endValue within remaining interaction time-
-                            {
-                                // stepAmount = ((target value - current value) / timeRemaining) * deltaTime
-                                float timeRemaining = interaction.ValueRO.InteractDuration - interaction.ValueRO.TimeElapsed;
-                                float3 stepAmount = ((actionBuffer.NeedAction.Value - newNeeds[i].Need.Value) / timeRemaining) * SystemAPI.Time.DeltaTime;
-                                MathHelpers.MoveTowards(ref current, ref target, math.abs(stepAmount[0]), out alteredNeed.Value);
-                                //alteredNeed.Value = actionBuffer.NeedAction.Value + stepAmount;
-                            }
-                            newNeeds[i] = new() { Need = alteredNeed };
                         }
-                    }
-                }
-                else
-                {
-                    // If there are any EActionType.SetNeed actions, then we don't care if the MoveTowards actions are all done-
-                    // we still have to wait for Duration so that SetNeed actions can complete fully
-                    isTargetNeedsValuesReached = false;
-                }
-            }
+                        break;
+                    case (EActionType.SetNeed):
+                        if (interaction.ValueRO.TimeElapsed < actionBuffer.InteractDuration)
+                            break;
 
-            interaction.ValueRW.TimeElapsed += SystemAPI.Time.DeltaTime;
-
-            // Action is done if we have reached the target value for all Needs,
-            // or the time elapsed is greater than the action duration
-            bool isActionFinished = isTargetNeedsValuesReached
-                || (interaction.ValueRO.InteractDuration != 0 && interaction.ValueRO.TimeElapsed >= interaction.ValueRO.InteractDuration);
-
-            // If action is done,
-            if (isActionFinished)
-            {
-                // Set need to target value
-                foreach (InteractionBuffer actionBuffer in action)
-                {
-                    if (actionBuffer.ActionType == EActionType.SetNeed)
-                    {
+                        // Set need to target value
                         for (int i = 0; i < newNeeds.Length; i++)
                         {
                             Need alteredNeed = newNeeds[i].Need;
@@ -108,17 +94,74 @@ public partial struct ActionHandlerSystem : ISystem
                                 alteredNeed.Value = actionBuffer.NeedAction.Value;
                             newNeeds[i] = new() { Need = alteredNeed };
                         }
-                    }
-                }
 
+                        // Set as complete in InteractionBuffer
+                        SetComplete(ref ecb, entity, actions, actionBuffer);
+                        break;
+
+                    /*
+                    case (EActionType.MoveTowards):
+                        for (int i = 0; i < newNeeds.Length; i++)
+                        {
+                            if (newNeeds[i].Need.Type == actionBuffer.NeedAction.Type)
+                            {
+                                Need alteredNeed = newNeeds[i].Need;
+                                float3 current = newNeeds[i].Need.Value;
+                                float3 target = actionBuffer.NeedAction.Value;
+
+                                if (math.distance(current, target) > 0.01f)
+                                    isTargetNeedsValuesReached = false;
+
+                                // If MoveTowardsAmount is set, use that value as the stepAmount-
+                                if (!actionBuffer.MoveTowardsAmount.Equals(float3.zero))
+                                {
+                                    float stepAmount = actionBuffer.MoveTowardsAmount[0] * SystemAPI.Time.DeltaTime;
+                                    MathHelpers.MoveTowards(ref current, ref target, stepAmount, out alteredNeed.Value);
+                                }
+                                else
+                                // Else: calculate amount to step to get from startValue to endValue within remaining interaction time-
+                                // (TODO: Fix this cause it doesn't seem to work how I expected)
+                                {
+                                    // stepAmount = ((target value - current value) / timeRemaining) * deltaTime
+                                    float timeRemaining = interaction.ValueRO.InteractDuration - interaction.ValueRO.TimeElapsed;
+                                    float3 stepAmount = ((actionBuffer.NeedAction.Value - newNeeds[i].Need.Value) / timeRemaining) * SystemAPI.Time.DeltaTime;
+                                    MathHelpers.MoveTowards(ref current, ref target, math.abs(stepAmount[0]), out alteredNeed.Value);
+                                }
+                                newNeeds[i] = new() { Need = alteredNeed };
+                            }
+                        }
+                        break;
+                        */
+                }
+            }
+
+            interaction.ValueRW.TimeElapsed += SystemAPI.Time.DeltaTime;
+
+            // If action is done,
+            if (isActionFinished)
+            {
                 // Remove all components related to the action from both Entities involved
-                ecb.RemoveComponent<ActionSetNeed>(entity);
                 ecb.RemoveComponent<Interaction>(entity);
+                ecb.RemoveComponent<QueuedAction>(entity);
                 ecb.RemoveComponent<InUseTag>(interaction.ValueRO.InteractionObject);
             }
         }
 
         ecb.Playback(state.EntityManager);
         ecb.Dispose();
+    }
+
+    [BurstCompile]
+    public void SetComplete(ref EntityCommandBuffer ecb, Entity entity, DynamicBuffer<InteractionBuffer> actions, InteractionBuffer actionBuffer)
+    {
+        DynamicBuffer<InteractionBuffer> newActionBufferSet = ecb.SetBuffer<InteractionBuffer>(entity);
+        for (int i = 0; i < actions.Length; i++)
+        {
+            InteractionBuffer newAction = actions[i];
+            if (actions[i].NeedAction.Type == actionBuffer.NeedAction.Type)
+                newAction.Complete = true;
+
+            newActionBufferSet.Add(newAction);
+        }
     }
 }

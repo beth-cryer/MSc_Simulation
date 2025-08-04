@@ -5,7 +5,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
-using Random = Unity.Mathematics.Random;
 
 // Lot of nested iteration over all entities happens here, so we limit it to a less frequent tick rate
 [UpdateInGroup(typeof(ActionRefreshSystemGroup))]
@@ -55,55 +54,65 @@ public partial struct ActionPlannerSystem : ISystem
                 float weightedValue = 0f;
                 foreach (NeedAdvertisementBuffer needAdvertised in needsAdvertised)
                 {
-                    //  TODO: WRITE SWITCH FOR CALCULATING WEIGHT OF EMOTION-DEPENDENT NEED
-                    //  (WILL BE BASED ON CLOSENESS OF CURRENT NEED VALUE TO NEED ADVERTISED)
-                    //  NeedRange - Abs(Distance between Mood values) * Intensity
-
                     // Get the current value from the NPC of the Need that this is advertising
-                    int n = 0;
+                    Nullable<Need> currentNeed = null;
                     foreach (NeedBuffer findNeed in needs)
                     {
                         if (findNeed.Need.Type == needAdvertised.NeedAdvertised.Type)
                         {
-                            break;
-                        }
-                        n++;
-                    }
-                    if (n > needs.Length) continue;
-
-                    // Find the corresponding Need Curve in global data blob, and evaluate NPC's current position on the Curve
-                    float curveValue = 1.0f;
-                    for (int i = 0; i < blobAsset.Value.NeedsData.Length; i++)
-                    {
-                        if (blobAsset.Value.NeedsData[i].Type == needs[i].Need.Type)
-                        {
-                            // (needMax - need) / needMax
-                            float currentNeedValue = math.clamp(
-                                (blobAsset.Value.NeedsData[i].MaxValue - needs[i].Need.Value) / blobAsset.Value.NeedsData[i].MaxValue,
-                                0f, 1f)[0];
-                            int curveIndex = (int)math.round(currentNeedValue * 25f);
-                            curveValue = blobAsset.Value.NeedsData[i].Curve[curveIndex];
-                            //Debug.Log(string.Format("currentNeedValue = {0}", currentNeedValue));
-                            //Debug.Log(string.Format("curveValue = {0}", curveValue));
+                            currentNeed = findNeed.Need;
                             break;
                         }
                     }
+                    if (!currentNeed.HasValue) continue; //if needAdvertised doesn't exist on the NPC, skip it
 
-                    /* Value without Curve applied
-                     * 
-                    float curveValue = 1.0f;
-                    for (int i = 0; i < blobAsset.Value.NeedsData.Length; i++)
+                    // Get the advertised Need's Curve in global data blob, and evaluate NPC's current position on the Curve
+                    ref var needData = ref blobAsset.Value.NeedsData[(int)needAdvertised.NeedAdvertised.Type];
+
+                    // (needMax - currentNeed) / needMax
+                    float currentNeedValue = math.clamp(
+                        (needData.MaxValue - currentNeed.Value.Value) / needData.MaxValue,
+                        0f, 1f)[0];
+                    int curveIndex = (int)math.round(currentNeedValue * 25f);
+                    float curveValue = curveValue = needData.Curve[curveIndex];
+                    //Debug.Log(string.Format("currentNeedValue = {0}", currentNeedValue));
+                    //Debug.Log(string.Format("curveValue = {0}", curveValue));
+
+                    // Value should be the value per second spent doing the action
+                    // So get the projected end Need value of the Action, and divide by Duration
+                    float advertisedValue = 0.0f;
+                    switch(needAdvertised.ActionType)
                     {
-                        if (blobAsset.Value.NeedsData[i].Type == needs[i].Need.Type)
-                        {
-                            curveValue = math.clamp(
-                                (blobAsset.Value.NeedsData[i].MaxValue - needs[i].Need.Value) / blobAsset.Value.NeedsData[i].MaxValue,
-                                0f, 1f)[0];
+                        case (EActionType.SetNeed):
+                            advertisedValue = needAdvertised.NeedAdvertised.Value[0] / needAdvertised.InteractDuration;
                             break;
-                        }
-                    }*/
+                        case (EActionType.ModifyNeed):
+                            // If Duration is set, check if we'll reach MaxValue by the end of the Action
+                            if (needAdvertised.InteractDuration != 0f)
+                            {
+                                float3 endResult = currentNeed.Value.Value + (needAdvertised.NeedValueChange * needAdvertised.InteractDuration);
+                                if (math.all(endResult < needData.MaxValue))
+                                {
+                                    // If we won't, then just use the end result
+                                    advertisedValue = endResult[0] / needAdvertised.InteractDuration;
+                                    break;
+                                }
+                            }
+                            
+                            // Otherwise, calculate how long it will take to reach max value
+                            // (max - current) / valueChangePerSecond
+                            float3 amountChanged = needData.MaxValue - currentNeed.Value.Value;
+                            float secondsToMax = (amountChanged / needAdvertised.NeedValueChange)[0];
+                            advertisedValue = needData.MaxValue[0] / secondsToMax;
+                            break;
 
-                    weightedValue += curveValue * needAdvertised.NeedAdvertised.Value[0];
+
+                            //  TODO: WRITE SWITCH FOR CALCULATING WEIGHT OF EMOTION-DEPENDENT NEED
+                            //  (WILL BE BASED ON CLOSENESS OF CURRENT NEED VALUE TO NEED ADVERTISED)
+                            //  NeedRange - Abs(Distance between Mood values) * Intensity
+                    }
+
+                    weightedValue += curveValue * advertisedValue;
                 }
 
                 // Add distance from NPC
@@ -111,7 +120,7 @@ public partial struct ActionPlannerSystem : ISystem
                 float distance = math.max(math.distance(npcPos, targetPos), 0.1f); //don't allow division by 0
                 //todo - maybe some kind of scaling here? we probably want distance to matter less as we get to larger distances
                 // perhaps...another curve, hmm?........
-                weightedValue *= (1 / distance);
+                //weightedValue *= (1 / distance);
                 sumOfWeights += weightedValue;
 
                 weights[weightCount] = new()
@@ -135,9 +144,8 @@ public partial struct ActionPlannerSystem : ISystem
             };
             ecb.AddComponent(npcEntity, pathfind);  // note: AddComponent overwrites existing component if there is one
 
-            ActionSetNeed action = new() {
-                InteractingObject = weights[randomIndex].InteractableObjectEntity,
-                Duration = weights[randomIndex].InteractableObject.InteractDuration
+            QueuedAction action = new() {
+                InteractionObject = weights[randomIndex].InteractableObjectEntity,
             };
             ecb.AddComponent(npcEntity, action);
 
@@ -150,7 +158,9 @@ public partial struct ActionPlannerSystem : ISystem
                 {
                     NeedAction = needAdvertised.NeedAdvertised,
                     ActionType = needAdvertised.ActionType,
-                    MoveTowardsAmount = needAdvertised.MoveTowardsAmount,
+                    NeedValueChange = needAdvertised.NeedValueChange,
+                    InteractDuration = needAdvertised.InteractDuration,
+                    RequiredToCompleteAction = needAdvertised.RequiredToCompleteAction,
                 });
             }
 
@@ -181,7 +191,6 @@ struct WeightedAction
     public DynamicBuffer<NeedAdvertisementBuffer> Buffer;
     public InteractableObject InteractableObject;
     public float3 Position;
-    public float InteractDuration;
     public float Weight;
     public Entity InteractableObjectEntity;
 }

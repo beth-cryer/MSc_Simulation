@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2eeebd0ed8580ba4585641ca9b7c0a89, type: 3}
-  m_Name: Object_Bed
+  m_Name: Object_Shelter
   m_EditorClassIdentifier: 
-  Name: Bed
-  Sprite: {fileID: 3968284269802435371, guid: 498d6c33c89360e43b56b0934609c613, type: 3}
+  Name: Warm Up
+  Sprite: {fileID: 21300000, guid: 60054fb54aa500a47b504824656ba720, type: 3}
   NeedsAdvertised:
   - NeedAdvertised:
-      Type: 2
+      Type: 1
       Value:
         x: 0
         y: 0
@@ -26,5 +26,5 @@ MonoBehaviour:
       x: 5
       y: 0
       z: 0
-    InteractDuration: 0
+    InteractDuration: 5
     RequiredToCompleteAction: 1

@@ -25,7 +25,7 @@ public partial struct DebugAddComponentSystem : ISystem
                     Destination = new float3(10, 10, 10)
                 };
 
-                ActionSetNeed action = new()
+                QueuedAction action = new()
                 {
 
                 };

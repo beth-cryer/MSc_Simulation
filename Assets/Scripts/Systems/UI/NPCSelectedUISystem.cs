@@ -18,10 +18,10 @@ public partial struct NPCSelectedUISystem : ISystem
             string interactableName = "?";
 
             // Find object we are interacting with
-            if (SystemAPI.HasComponent<ActionSetNeed>(entity))
+            if (SystemAPI.HasComponent<QueuedAction>(entity))
             {
-                var action = SystemAPI.GetComponent<ActionSetNeed>(entity);
-                interactableName = SystemAPI.GetComponent<InteractableObject>(action.InteractingObject).Name.ToString();
+                var action = SystemAPI.GetComponent<QueuedAction>(entity);
+                interactableName = SystemAPI.GetComponent<InteractableObject>(action.InteractionObject).Name.ToString();
 
                 // Either moving to the object or performing the action
                 if (SystemAPI.HasComponent<ActionPathfind>(entity))
