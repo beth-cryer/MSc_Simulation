@@ -27,4 +27,5 @@ MonoBehaviour:
       y: 0
       z: 0
     InteractDuration: 5
+    MinInteractDuration: 5
     RequiredToCompleteAction: 1

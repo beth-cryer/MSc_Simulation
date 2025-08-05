@@ -7,19 +7,6 @@ using UnityEngine;
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public partial struct NeedsDecaySystem : ISystem
 {
-    float3 min, max;
-    float3 decayRate;
-
-    [BurstCompile]
-    public void OnCreate(ref SystemState state)
-    {
-        // 120 seconds to decay from 100 to 0
-        decayRate = 60.0f / 120.0f;
-        min = 0.0f;
-        max = 100.0f;
-    }
-
-
     //TODO OPTIMIZATION:
     // instead of doing this every frame, just run the calculation whenever it's relevant
     // and check the time elapsed since last update to extrapolate the current Need value
@@ -27,6 +14,7 @@ public partial struct NeedsDecaySystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        BlobAssetReference<ObjectsBlobAsset> blobAsset = SystemAPI.GetSingleton<BlobSingleton>().BlobAssetReference;
         EntityCommandBuffer ecb = new(Allocator.TempJob);
 
         // Passively decay NPC needs over time
@@ -34,13 +22,16 @@ public partial struct NeedsDecaySystem : ISystem
             SystemAPI.Query<RefRW<NPC>, DynamicBuffer<NeedBuffer>>()
             .WithEntityAccess())
         {
+            // TODO: Read InteractionBuffer and don't decay need if it's being fulfilled
+
             DynamicBuffer<NeedBuffer> buffer = ecb.SetBuffer<NeedBuffer>(entity);
 
             // For each NPC Need; decay the value and copy that to ECB, then overwrite the NPC Needs buffer using ECB
             foreach (NeedBuffer need in needs)
             {
                 Need alteredNeed = need.Need;
-                alteredNeed.Value = math.clamp(alteredNeed.Value - decayRate * SystemAPI.Time.DeltaTime, min, max);
+                ref NeedsData needsData = ref blobAsset.Value.NeedsData[(int)need.Need.Type];
+                alteredNeed.Value = math.clamp(alteredNeed.Value - needsData.DecayRate * SystemAPI.Time.DeltaTime, needsData.MinValue, needsData.MaxValue);
 
                 buffer.Add(new() { Need = alteredNeed });
             }

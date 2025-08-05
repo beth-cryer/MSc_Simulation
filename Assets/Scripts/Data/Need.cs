@@ -32,5 +32,6 @@ public struct NeedAdvertisementBuffer : IBufferElementData
     public EActionType ActionType;
     public float3 NeedValueChange;
     public float InteractDuration;
+    public float MinInteractDuration;
     public bool RequiredToCompleteAction;
 }

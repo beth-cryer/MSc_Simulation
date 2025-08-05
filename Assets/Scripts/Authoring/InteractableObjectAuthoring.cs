@@ -30,6 +30,7 @@ public class InteractableObjectAuthoring : MonoBehaviour
                     ActionType = need.ActionType,
                     NeedValueChange = need.NeedValueChange,
                     InteractDuration = need.InteractDuration,
+                    MinInteractDuration = need.MinInteractDuration,
                     RequiredToCompleteAction = need.RequiredToCompleteAction,
                 });
             }

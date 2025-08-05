@@ -70,9 +70,10 @@ public partial struct ActionHandlerSystem : ISystem
                                     needData.MinValue,
                                     needData.MaxValue);
 
-                                if (interaction.ValueRO.TimeElapsed >= actionBuffer.InteractDuration
+                                if (interaction.ValueRO.TimeElapsed >= actionBuffer.MinInteractDuration &&
+                                    (interaction.ValueRO.TimeElapsed >= actionBuffer.InteractDuration
                                     || math.all(alteredNeed.Value == needData.MaxValue)
-                                    || math.all(alteredNeed.Value == needData.MinValue))
+                                    || math.all(alteredNeed.Value == needData.MinValue)))
                                 {
                                     // Set as complete in InteractionBuffer
                                     SetComplete(ref ecb, entity, actions, actionBuffer);
@@ -140,6 +141,7 @@ public partial struct ActionHandlerSystem : ISystem
             // If action is done,
             if (isActionFinished)
             {
+                interaction.ValueRW.TimeElapsed = 0.0f;
                 // Remove all components related to the action from both Entities involved
                 ecb.RemoveComponent<Interaction>(entity);
                 ecb.RemoveComponent<QueuedAction>(entity);

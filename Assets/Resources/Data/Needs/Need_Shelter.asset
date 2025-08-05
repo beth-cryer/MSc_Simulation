@@ -28,8 +28,8 @@ MonoBehaviour:
     z: 0
   DecayRate:
     x: 1
-    y: 1
-    z: 1
+    y: 0
+    z: 0
   IsVisibleNeed: 1
   Curve:
     serializedVersion: 2

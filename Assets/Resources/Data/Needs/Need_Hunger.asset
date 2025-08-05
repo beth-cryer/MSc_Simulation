@@ -28,8 +28,8 @@ MonoBehaviour:
     z: 0
   DecayRate:
     x: 1
-    y: 1
-    z: 1
+    y: 0
+    z: 0
   IsVisibleNeed: 1
   Curve:
     serializedVersion: 2
@@ -38,20 +38,20 @@ MonoBehaviour:
       time: 0
       value: 0.1
       inSlope: 0.19008173
-      outSlope: 0.19008173
-      tangentMode: 0
+      outSlope: 0.2059624
+      tangentMode: 1
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.08236172
+      outWeight: 0.068861425
     - serializedVersion: 3
-      time: 0.9053298
-      value: 0.39884388
-      inSlope: 1.354586
-      outSlope: 1.354586
+      time: 0.9
+      value: 0.4
+      inSlope: 1.4185597
+      outSlope: 1.4185597
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 1
+      outWeight: 0.45538568
     - serializedVersion: 3
       time: 1
       value: 1

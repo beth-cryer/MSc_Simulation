@@ -23,8 +23,9 @@ MonoBehaviour:
         z: 0
     ActionType: 1
     NeedValueChange:
-      x: 5
+      x: 2
       y: 0
       z: 0
     InteractDuration: 0
+    MinInteractDuration: 0
     RequiredToCompleteAction: 1

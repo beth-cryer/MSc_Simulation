@@ -25,7 +25,8 @@ public class BlobAuthoring: MonoBehaviour
             // Populate Blob Data with Needs and generate arrays from curves
             for (int i = 0; i < NeedData.Length; i++)
             {
-                needsArray[(int)NeedData[i].Type] = new()
+                int index = (int)NeedData[i].Type;
+                needsArray[index] = new()
                 {
                     Type = NeedData[i].Type,
                     MinValue = NeedData[i].MinValue,
@@ -34,9 +35,8 @@ public class BlobAuthoring: MonoBehaviour
                     DecayRate = NeedData[i].DecayRate,
                 };
 
-                // We'll sample at a fidelity of 25, so every 4 steps in the curve
-                int sampleSize = 25;
-                BlobBuilderArray<float> curve = blobBuilder.Allocate(ref needsArray[i].Curve, sampleSize + 1);
+                int sampleSize = 100;
+                BlobBuilderArray<float> curve = blobBuilder.Allocate(ref needsArray[index].Curve, sampleSize);
                 AnimationCurveToArray(NeedData[i].Curve, ref curve, sampleSize);
             }
 
@@ -57,7 +57,7 @@ public class BlobAuthoring: MonoBehaviour
             float sampleRate = 1 / sampleSize;
             for (int i = 0; i < sampleSize; i++)
             {
-                array[i] = Mathf.Clamp(curve.Evaluate(i * sampleRate), 0f, 1f);
+                array[i] = Mathf.Clamp01(curve.Evaluate(i * sampleRate));
             }
         }
     }
