@@ -14,18 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Bed
   Sprite: {fileID: 3968284269802435371, guid: 498d6c33c89360e43b56b0934609c613, type: 3}
-  NeedsAdvertised:
+  ActionsAdvertised:
   - NeedAdvertised:
-      Type: 2
-      Value:
-        x: 0
+    - NeedAdvertised:
+        Type: 2
+        Value:
+          x: 0
+          y: 0
+          z: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 2
         y: 0
         z: 0
-    ActionType: 1
-    NeedValueChange:
-      x: 2
-      y: 0
-      z: 0
-    InteractDuration: 0
-    MinInteractDuration: 0
-    RequiredToCompleteAction: 1
+      InteractDuration: 0
+      MinInteractDuration: 12
+      RequiredToCompleteAction: 1

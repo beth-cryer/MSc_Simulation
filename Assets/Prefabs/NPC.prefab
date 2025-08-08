@@ -101,6 +101,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3adc2800fd8d024e84e92cf852a802b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ActionsAdvertised:
+  - NeedAdvertised:
+    - NeedAdvertised:
+        Type: 3
+        Value:
+          x: 0
+          y: 0
+          z: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 10
+        y: 0
+        z: 0
+      InteractDuration: 3
+      MinInteractDuration: 3
+      RequiredToCompleteAction: 1
   NeedsAdvertised:
   - Type: 0
     Value:

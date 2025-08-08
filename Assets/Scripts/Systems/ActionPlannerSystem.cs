@@ -41,8 +41,8 @@ public partial struct ActionPlannerSystem : ISystem
             float sumOfWeights = 0;
 
             // Loop through each Interactable and check their Advertised Needs and calculate their Utility weight
-            foreach (var (obj, objTransform, needsAdvertised, objEntity) in
-                SystemAPI.Query<RefRO<InteractableObject>, RefRO<LocalTransform>, DynamicBuffer<NeedAdvertisementBuffer>>()
+            foreach (var (obj, objTransform, actionsAdvertised, needsAdvertised, objEntity) in
+                SystemAPI.Query<RefRO<InteractableObject>, RefRO<LocalTransform>, DynamicBuffer<ActionAdvertisementBuffer>, DynamicBuffer <NeedAdvertisementBuffer>>()
                 .WithNone<InUseTag, ActionPathfind>()
                 .WithEntityAccess())
             {
@@ -50,94 +50,104 @@ public partial struct ActionPlannerSystem : ISystem
                 // add (Curve Value of (NPC Need)) * Need Advertised
                 // add (100 - NPC Need) * Need Advertised,
                 // then * result by (1/Distance)
-                float weightedValue = 0f;
-                foreach (NeedAdvertisementBuffer needAdvertised in needsAdvertised)
+                foreach (ActionAdvertisementBuffer actionAdvertised in actionsAdvertised)
                 {
-                    // Get the current value from the NPC of the Need that this is advertising
-                    Nullable<Need> currentNeed = null;
-                    foreach (NeedBuffer findNeed in needs)
+                    float weightedValue = 0f;
+
+                    //Loop through the Needs advertised by the Action
+                    for (int i = actionAdvertised.NeedAdvertisedIndex;
+                        i < actionAdvertised.NeedAdvertisedIndex + actionAdvertised.NeedAdvertisedCount;
+                        i++)
                     {
-                        if (findNeed.Need.Type == needAdvertised.NeedAdvertised.Type)
+                        NeedAdvertisementBuffer needAdvertised = needsAdvertised[i];
+
+                        // Get the current value from the NPC of the Need that this is advertising
+                        Nullable<Need> currentNeed = null;
+                        foreach (NeedBuffer findNeed in needs)
                         {
-                            currentNeed = findNeed.Need;
-                            break;
-                        }
-                    }
-
-                    ref var needData = ref blobAsset.Value.NeedsData[(int)needAdvertised.NeedAdvertised.Type];
-
-                    if (!currentNeed.HasValue) continue; //if needAdvertised doesn't exist on the NPC, skip it
-                    if (currentNeed.Value.Value[0] == needData.MaxValue[0]) continue; //if need is already at max value, skip it
-
-                    // Value should be the value per second spent doing the action
-                    // So get the projected end Need value of the Action, and divide by Duration
-                    float advertisedValue = 0.0f;
-                    float3 endResult = 0.0f;
-                    switch(needAdvertised.ActionType)
-                    {
-                        case (EActionType.SetNeed):
-                            if (needAdvertised.InteractDuration == 0) continue; // if this happens then the interaction is configured wrong
-                            endResult = needAdvertised.NeedAdvertised.Value;
-                            advertisedValue = endResult[0] / needAdvertised.InteractDuration;
-                            break;
-                        case (EActionType.ModifyNeed):
-                            if (needAdvertised.NeedValueChange[0] == 0) continue; // if this happens then the interaction is configured wrong
-
-                            // If Duration is set, check if we'll reach MaxValue by the end of the Action's duration
-                            if (needAdvertised.InteractDuration != 0f)
+                            if (findNeed.Need.Type == needAdvertised.NeedAdvertised.Type)
                             {
-                                endResult = currentNeed.Value.Value + (needAdvertised.NeedValueChange * needAdvertised.InteractDuration);
-                                if (endResult[0] < needData.MaxValue[0])
-                                {
-                                    // If we won't, then just use the end result
-                                    advertisedValue = endResult[0] / needAdvertised.InteractDuration;
-                                    break;
-                                }
+                                currentNeed = findNeed.Need;
+                                break;
                             }
+                        }
 
-                            // Otherwise, calculate how long it will take to reach max value
-                            // (max - current) / valueChangePerSecond
-                            float3 amountChanged = needData.MaxValue - currentNeed.Value.Value;
-                            float secondsToMax = amountChanged[0] / needAdvertised.NeedValueChange[0];
-                            advertisedValue = (secondsToMax == 0)
-                                ? needData.MaxValue[0]
-                                : needData.MaxValue[0] / secondsToMax;
-                            break;
+                        ref var needData = ref blobAsset.Value.NeedsData[(int)needAdvertised.NeedAdvertised.Type];
+
+                        if (!currentNeed.HasValue) continue; //if needAdvertised doesn't exist on the NPC, skip it
+                        if (currentNeed.Value.Value[0] == needData.MaxValue[0]) continue; //if need is already at max value, skip it
+
+                        // Value should be the value per second spent doing the action
+                        // So get the projected end Need value of the Action, and divide by Duration
+                        float advertisedValue = 0.0f;
+                        float3 endResult = 0.0f;
+                        switch (needAdvertised.ActionType)
+                        {
+                            case (EActionType.SetNeed):
+                                if (needAdvertised.InteractDuration == 0) continue; // if this happens then the interaction is configured wrong
+                                endResult = needAdvertised.NeedAdvertised.Value;
+                                advertisedValue = endResult[0] / needAdvertised.InteractDuration;
+                                break;
+                            case (EActionType.ModifyNeed):
+                                if (needAdvertised.NeedValueChange[0] == 0) continue; // if this happens then the interaction is configured wrong
+
+                                // If Duration is set, check if we'll reach MaxValue by the end of the Action's duration
+                                if (needAdvertised.InteractDuration != 0f)
+                                {
+                                    endResult = currentNeed.Value.Value + (needAdvertised.NeedValueChange * needAdvertised.InteractDuration);
+                                    if (endResult[0] < needData.MaxValue[0])
+                                    {
+                                        // If we won't, then just use the end result
+                                        advertisedValue = endResult[0] / needAdvertised.InteractDuration;
+                                        break;
+                                    }
+                                }
+
+                                // Otherwise, calculate how long it will take to reach max value
+                                // (max - current) / valueChangePerSecond
+                                float3 amountChanged = needData.MaxValue - currentNeed.Value.Value;
+                                float secondsToMax = amountChanged[0] / needAdvertised.NeedValueChange[0];
+                                advertisedValue = (secondsToMax == 0)
+                                    ? needData.MaxValue[0]
+                                    : needData.MaxValue[0] / secondsToMax;
+                                break;
 
 
-                            //  TODO: WRITE SWITCH FOR CALCULATING WEIGHT OF EMOTION-DEPENDENT NEED
-                            //  (WILL BE BASED ON CLOSENESS OF CURRENT NEED VALUE TO NEED ADVERTISED)
-                            //  NeedRange - Abs(Distance between Mood values) * Intensity
+                                //  TODO: WRITE SWITCH FOR CALCULATING WEIGHT OF EMOTION-DEPENDENT NEED
+                                //  (WILL BE BASED ON CLOSENESS OF CURRENT NEED VALUE TO NEED ADVERTISED)
+                                //  NeedRange - Abs(Distance between Mood values) * Intensity
+                        }
+
+                        // Get the advertised Need's scaling Curve, and evaluate position of the NPC's current Need value on the curve
+                        // (needMax - currentNeed) / needMax
+                        float currentNeedValue = math.clamp((needData.MaxValue - currentNeed.Value.Value) / needData.MaxValue, 0f, 1f)[0];
+                        int curveIndex = (int)math.round(currentNeedValue * 99f);
+                        float curveValue = needData.Curve[curveIndex];
+
+                        weightedValue += advertisedValue * curveValue;
+                        Debug.Log(string.Format("need = {0}, weighted value = {1}, advertisedValue = {2} currentNeedValue = {3}, curveIndex = {4}, curveValue = {5}",
+                            needAdvertised.NeedAdvertised.Type.ToString(), weightedValue, advertisedValue, currentNeedValue, curveIndex, curveValue));
+
                     }
 
-                    // Get the advertised Need's scaling Curve, and evaluate position of the NPC's current Need value on the curve
-                    // (needMax - currentNeed) / needMax
-                    float currentNeedValue = math.clamp((needData.MaxValue - currentNeed.Value.Value) / needData.MaxValue, 0f, 1f)[0];
-                    int curveIndex = (int)math.round(currentNeedValue * 99f);
-                    float curveValue = needData.Curve[curveIndex];
+                    // Add distance from NPC
+                    float3 targetPos = objTransform.ValueRO.Position;
+                    float distance = math.max(math.distance(npcPos, targetPos), 1.0f); //don't allow division by 0
+                    //todo - maybe some kind of scaling here? we probably want distance to matter less as we get to larger distances
+                    // perhaps...another curve, hmm?........
+                    weightedValue *= (1 / distance);
+                    sumOfWeights += weightedValue;
 
-                    weightedValue += advertisedValue * curveValue;
-                    Debug.Log(string.Format("need = {0}, weighted value = {1}, advertisedValue = {2} currentNeedValue = {3}, curveIndex = {4}, curveValue = {5}",
-                        needAdvertised.NeedAdvertised.Type.ToString(), weightedValue, advertisedValue, currentNeedValue, curveIndex, curveValue));
+                    weights[weightCount] = new()
+                    {
+                        InteractableObjectEntity = objEntity,
+                        InteractableObject = obj.ValueRO,
+                        Buffer = needsAdvertised,
+                        Position = objTransform.ValueRO.Position,
+                        Weight = weightedValue
+                    };
+                    weightCount++;
                 }
-
-                // Add distance from NPC
-                float3 targetPos = objTransform.ValueRO.Position;
-                float distance = math.max(math.distance(npcPos, targetPos), 1.0f); //don't allow division by 0
-                //todo - maybe some kind of scaling here? we probably want distance to matter less as we get to larger distances
-                // perhaps...another curve, hmm?........
-                weightedValue *= (1 / distance);
-                sumOfWeights += weightedValue;
-
-                weights[weightCount] = new()
-                {
-                    InteractableObjectEntity = objEntity,
-                    InteractableObject = obj.ValueRO,
-                    Buffer = needsAdvertised,
-                    Position = objTransform.ValueRO.Position,
-                    Weight = weightedValue
-                };
-                weightCount++;
             }
 
             //Debug.Log(string.Format("checked {0} possibilites", weightCount));

@@ -20,19 +20,32 @@ public class InteractableObjectAuthoring : MonoBehaviour
             };
             AddComponent(entity, obj);
 
-            // Add all of the needs advertised by the object to its Entity
+            DynamicBuffer<ActionAdvertisementBuffer> actionsAdvertised = AddBuffer<ActionAdvertisementBuffer>(entity);
             DynamicBuffer<NeedAdvertisementBuffer> needsAdvertised = AddBuffer<NeedAdvertisementBuffer>(entity);
-            foreach (NeedAdvertisedData need in authoring.ObjectData.NeedsAdvertised)
+
+            int i = 0;
+            foreach (var actionAdvertised in authoring.ObjectData.ActionsAdvertised)
             {
-                needsAdvertised.Add(new()
+                actionsAdvertised.Add(new()
                 {
-                    NeedAdvertised = need.NeedAdvertised,
-                    ActionType = need.ActionType,
-                    NeedValueChange = need.NeedValueChange,
-                    InteractDuration = need.InteractDuration,
-                    MinInteractDuration = need.MinInteractDuration,
-                    RequiredToCompleteAction = need.RequiredToCompleteAction,
+                    NeedAdvertisedCount = actionAdvertised.NeedAdvertised.Length,
+                    NeedAdvertisedIndex = i,
                 });
+
+                // Add all of the needs advertised by the object to its Entity
+                foreach (NeedAdvertisedData need in actionAdvertised.NeedAdvertised)
+                {
+                    needsAdvertised.Add(new()
+                    {
+                        NeedAdvertised = need.NeedAdvertised,
+                        ActionType = need.ActionType,
+                        NeedValueChange = need.NeedValueChange,
+                        InteractDuration = need.InteractDuration,
+                        MinInteractDuration = need.MinInteractDuration,
+                        RequiredToCompleteAction = need.RequiredToCompleteAction,
+                    });
+                    i++;
+                }
             }
 
             // Set object sprite
@@ -42,4 +55,10 @@ public class InteractableObjectAuthoring : MonoBehaviour
             renderer.sprite = authoring.ObjectData.Sprite;
         }
     }
+}
+
+public struct ActionAdvertisementBuffer: IBufferElementData
+{
+    public int NeedAdvertisedIndex;
+    public int NeedAdvertisedCount;
 }

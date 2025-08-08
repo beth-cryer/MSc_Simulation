@@ -14,18 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Read Book
   Sprite: {fileID: -3784609330376001291, guid: 498d6c33c89360e43b56b0934609c613, type: 3}
-  NeedsAdvertised:
+  ActionsAdvertised:
   - NeedAdvertised:
-      Type: 5
-      Value:
-        x: 0
+    - NeedAdvertised:
+        Type: 5
+        Value:
+          x: 0
+          y: 0
+          z: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 5
         y: 0
         z: 0
-    ActionType: 1
-    NeedValueChange:
-      x: 5
-      y: 0
-      z: 0
-    InteractDuration: 5
-    MinInteractDuration: 5
-    RequiredToCompleteAction: 1
+      InteractDuration: 4
+      MinInteractDuration: 2
+      RequiredToCompleteAction: 1

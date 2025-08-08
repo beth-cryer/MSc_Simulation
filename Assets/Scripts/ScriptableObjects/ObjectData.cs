@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -7,7 +8,13 @@ public class ObjectData: ScriptableObject
 {
     public string Name;
     public Sprite Sprite;
-    public NeedAdvertisedData[] NeedsAdvertised;
+    public List<ActionAdvertised> ActionsAdvertised;
+}
+
+[Serializable]
+public class ActionAdvertised
+{
+    public NeedAdvertisedData[] NeedAdvertised;
 }
 
 [Serializable]

@@ -1,8 +1,12 @@
 using Unity.Collections;
 using Unity.Entities;
 
-struct InteractableObject: IComponentData
+public struct InteractableObject: IComponentData
 {
     public FixedString32Bytes Name;
-    public float InteractDuration;
+}
+
+public struct ObjectActionBuffer : IBufferElementData
+{
+    public Entity ActionEntity;
 }
