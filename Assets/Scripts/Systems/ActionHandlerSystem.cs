@@ -71,7 +71,7 @@ public partial struct ActionHandlerSystem : ISystem
                                     needData.MaxValue);
 
                                 if (interaction.ValueRO.TimeElapsed >= actionBuffer.MinInteractDuration &&
-                                    (interaction.ValueRO.TimeElapsed >= actionBuffer.InteractDuration
+                                    ((actionBuffer.InteractDuration > 0 && interaction.ValueRO.TimeElapsed >= actionBuffer.InteractDuration)
                                     || math.all(alteredNeed.Value == needData.MaxValue)
                                     || math.all(alteredNeed.Value == needData.MinValue)))
                                 {

@@ -40,7 +40,7 @@ public partial struct ActionPlannerSystem : ISystem
             int weightCount = 0;
             float sumOfWeights = 0;
 
-            // Loop through each Interactable and check their Advertised Needs and calculate their Utility weight
+            // Loop through each Interactable, check their Advertised Needs and calculate their Utility weight
             foreach (var (obj, objTransform, actionsAdvertised, needsAdvertised, objEntity) in
                 SystemAPI.Query<RefRO<InteractableObject>, RefRO<LocalTransform>, DynamicBuffer<ActionAdvertisementBuffer>, DynamicBuffer <NeedAdvertisementBuffer>>()
                 .WithNone<InUseTag, ActionPathfind>()

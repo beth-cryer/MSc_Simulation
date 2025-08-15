@@ -34,6 +34,8 @@ public class NPCAgentAuthoring: MonoBehaviour
 
             AddComponent(entity, npc);
 
+            return;
+
             // Add Social Actions
             DynamicBuffer<ActionAdvertisementBuffer> actionsAdvertised = AddBuffer<ActionAdvertisementBuffer>(entity);
             DynamicBuffer<NeedAdvertisementBuffer> needsAdvertised = AddBuffer<NeedAdvertisementBuffer>(entity);

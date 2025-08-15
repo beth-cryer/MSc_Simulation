@@ -22,11 +22,11 @@ public class SelectedEntityUI : MonoBehaviour
 
     public void UpdateUI(NPC npc, List<Need> needs, string goal)
     {
-        string text = string.Format("{0}\n\nGOAL:\n{1}\n\nNEEDS:\n", npc.Name, goal);
+        string text = string.Format("{0}\n\nGOAL:\n{1}", npc.Name, goal);
 
         // Needs bars-
         // Check how many there are in children, add extras if needed
-        int childCount = m_needsLayoutGroup.childCount - 1;
+        int childCount = m_needsLayoutGroup.childCount;
         if (needs.Count > childCount)
         {
             for (int i = 0; i < needs.Count - childCount; i++)
@@ -40,7 +40,7 @@ public class SelectedEntityUI : MonoBehaviour
 
         // loop through needs transform children, find valid visible need to populate with
         // if we run out of needs and there's still children left, set remaining to inactive
-        for (int i = 1; i < m_needsLayoutGroup.childCount; i++)
+        for (int i = 0; i < m_needsLayoutGroup.childCount; i++)
         {
             Transform needTransform = m_needsLayoutGroup.GetChild(i);
 
