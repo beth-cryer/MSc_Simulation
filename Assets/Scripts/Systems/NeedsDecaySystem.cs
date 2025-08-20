@@ -11,6 +11,10 @@ public partial struct NeedsDecaySystem : ISystem
     // instead of doing this every frame, just run the calculation whenever it's relevant
     // and check the time elapsed since last update to extrapolate the current Need value
 
+    // this will actually naturally mean that needs don't decay while an action is updating them,
+    // as the timeSinceLastSet can be set to 0 when updated
+    // just have to remember to actually do the update in the action planner since Need values must be current there
+
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {

@@ -40,8 +40,7 @@ public partial struct ActionHandlerSystem : ISystem
                 newNeeds.Add(new() { Need = needs[i].Need });
             }
 
-            // Action is finished if we have reached the target value or time has elapsed
-            // for all Needs which are RequiredToCompleteAction
+            // Action is finished if we have reached the target value or time has elapsed for all Needs that are RequiredToCompleteAction
             bool isActionFinished = true; // if there are any needs that aren't at target, we'll set this to false
 
             // Move need towards target value gradually
@@ -139,14 +138,17 @@ public partial struct ActionHandlerSystem : ISystem
             interaction.ValueRW.TimeElapsed += SystemAPI.Time.DeltaTime;
 
             // If action is done,
-            if (isActionFinished)
-            {
-                interaction.ValueRW.TimeElapsed = 0.0f;
-                // Remove all components related to the action from both Entities involved
-                ecb.RemoveComponent<Interaction>(entity);
-                ecb.RemoveComponent<QueuedAction>(entity);
-                ecb.RemoveComponent<InUseTag>(interaction.ValueRO.InteractionObject);
-            }
+            if (!isActionFinished)
+                continue;
+
+            // Create short term Memory
+            //
+
+            // Remove all components related to the action from both Entities involved
+            //interaction.ValueRW.TimeElapsed = 0.0f;
+            ecb.RemoveComponent<Interaction>(entity);
+            ecb.RemoveComponent<QueuedAction>(entity);
+            ecb.RemoveComponent<InUseTag>(interaction.ValueRO.InteractionObject);
         }
 
         ecb.Playback(state.EntityManager);

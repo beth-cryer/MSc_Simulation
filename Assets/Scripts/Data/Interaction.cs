@@ -27,3 +27,9 @@ public enum EActionType
     //MoveTowards, // (move towards value by x amount per second)
     ModifyNeed, // (modify need value by x amount per second) eg. sleeping, eating
 }
+
+public struct ActionAdvertisementBuffer : IBufferElementData
+{
+    public int NeedAdvertisedIndex;
+    public int NeedAdvertisedCount;
+}

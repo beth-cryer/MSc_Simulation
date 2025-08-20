@@ -56,9 +56,3 @@ public class InteractableObjectAuthoring : MonoBehaviour
         }
     }
 }
-
-public struct ActionAdvertisementBuffer: IBufferElementData
-{
-    public int NeedAdvertisedIndex;
-    public int NeedAdvertisedCount;
-}
