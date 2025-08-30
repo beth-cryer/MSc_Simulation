@@ -17,6 +17,7 @@ public partial struct ActionPlannerSystem : ISystem
         state.RequireForUpdate<RandomSingleton>();
     }
 
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         Debug.Log("AI update tick");
@@ -125,17 +126,27 @@ public partial struct ActionPlannerSystem : ISystem
                         float curveValue = needData.Curve[curveIndex];
 
                         weightedValue += advertisedValue * curveValue;
+
+                        /* Can't format strings unless we turn off BurstCompile :)
+                         * 
                         Debug.Log(string.Format("need = {0}, weighted value = {1}, advertisedValue = {2} currentNeedValue = {3}, curveIndex = {4}, curveValue = {5}",
                             needAdvertised.NeedAdvertised.Type.ToString(), weightedValue, advertisedValue, currentNeedValue, curveIndex, curveValue));
-
+                        */
                     }
 
                     // Add distance from NPC
                     float3 targetPos = objTransform.ValueRO.Position;
                     float distance = math.max(math.distance(npcPos, targetPos), 1.0f); //don't allow division by 0
-                    //todo - maybe some kind of scaling here? we probably want distance to matter less as we get to larger distances
-                    // perhaps...another curve, hmm?........
-                    weightedValue *= (1 / distance);
+                    //Scale distance on curve
+                    ref DistanceScalingData distanceScalingData = ref blobAsset.Value.DistanceScalingData;
+                    float min = distanceScalingData.MinDistance;
+                    float max = distanceScalingData.MaxDistance;
+
+                    distance = math.clamp(distance, min, max);
+                    int distanceCurveIndex = (int)(((distance - min) / max) * 99.0f);
+                    float distanceScaled = distanceScalingData.DistanceCurve[distanceCurveIndex];
+
+                    weightedValue *= distanceScaled;
                     sumOfWeights += weightedValue;
 
                     weights[weightCount] = new()
@@ -188,6 +199,7 @@ public partial struct ActionPlannerSystem : ISystem
         ecb.Dispose();
     }
 
+    [BurstCompile]
     private readonly int PickWeightedValue(ref RandomSingleton random, ref NativeArray<WeightedAction> weights, int weightCount, float sumOfWeights)
     {
         float r = random.Random.NextFloat() * sumOfWeights;

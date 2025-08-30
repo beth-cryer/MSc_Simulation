@@ -35,14 +35,43 @@ public partial struct LongTermMemorySystem : ISystem
                 continue;
 
             // Create long term memory
-            var shortMemoryArray = shortMemoryBuffer.AsNativeArray();
+            NativeArray<ShortTermMemoryBuffer> shortMemoryArray = shortMemoryBuffer.AsNativeArray();
 
             // Sort short term memories by emotion intensity
-            // Keep only top memory of each Type present
             SortJob<ShortTermMemoryBuffer, CustomComparer> sortJob = shortMemoryArray.SortJob<ShortTermMemoryBuffer, CustomComparer>(default);
             var jobHandle = sortJob.Schedule();
             jobHandle.Complete();
+
+            // Filter out memories of the same type, keeping only the most intense memory of each type
+            NativeArray<ShortTermMemoryBuffer> memoryFilteredTypes = new(shortMemoryArray.Length, Allocator.TempJob);
+            for (int t = 0; t < 2; t++)
+            {
+                int bestMemoryOfType = -1;
+                for (int i = 0; i < shortMemoryArray.Length; i++)
+                {
+                    if (shortMemoryArray[i].Memory.Type != t)
+                        continue;
+
+                    // First memory of type is automatically the best
+                    if (bestMemoryOfType == -1)
+                    {
+                        bestMemoryOfType = i;
+                        continue;
+                    }
+
+                    // Replace best memory if we find a more intense one here
+                    if (Compare(shortMemoryArray[i], shortMemoryArray[bestMemoryOfType]) > 0)
+                        bestMemoryOfType = i;
+                }
+
+                if (bestMemoryOfType == -1)
+                    continue;
+
+                memoryFilteredTypes[memoryFilteredTypes.Length-1] = shortMemoryArray[bestMemoryOfType];
+            }
+
             //longMemoryArray.GroupBy(m => m.Memory.Type).Select(g => g.First());
+            // (could have been this 1 line but alas....burstcompiler my nemesis......)
 
             // Take top MemoryLimit num. of short term memories into long term memory
             int longTermLength = 0;
@@ -74,6 +103,18 @@ public partial struct LongTermMemorySystem : ISystem
 
         ecb.Playback(state.EntityManager);
         ecb.Dispose();
+    }
+
+    [BurstCompile]
+    public int Compare(ShortTermMemoryBuffer x, ShortTermMemoryBuffer y)
+    {
+        if (x.Memory.EmotionResponse[0] < y.Memory.EmotionResponse[0])
+            return -1;
+
+        if (x.Memory.EmotionResponse[0] > y.Memory.EmotionResponse[0])
+            return 1;
+
+        return 0;
     }
 }
 
