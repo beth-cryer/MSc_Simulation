@@ -20,9 +20,9 @@ public class SelectedEntityUI : MonoBehaviour
         m_needData = Resources.LoadAll<NeedData>("Data/Needs/");
     }
 
-    public void UpdateUI(NPC npc, List<Need> needs, string goal)
+    public void UpdateUI(NPC npc, List<Need> needs, string name, string goal)
     {
-        string text = string.Format("{0}\n\nGOAL:\n{1}", npc.Name, goal);
+        string text = string.Format("{0}\n\nGOAL:\n{1}", name, goal);
 
         // Needs bars-
         // Check how many there are in children, add extras if needed

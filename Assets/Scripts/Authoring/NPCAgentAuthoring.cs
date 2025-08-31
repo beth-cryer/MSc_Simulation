@@ -11,11 +11,12 @@ public class NPCAgentAuthoring: MonoBehaviour
         public override void Bake(NPCAgentAuthoring authoring)
         {
             Entity entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
+            string npcName = string.Format("NPC #{0}", entity.Index);
 
             // Add the NPC component to the Entity
             NPC npc = new()
             {
-                Name = string.Format("NPC #{0}", entity.Index),
+                Name = npcName,
                 Speed = 5.0f
             };
 
@@ -62,7 +63,10 @@ public class NPCAgentAuthoring: MonoBehaviour
                 }
             }
 
-            InteractableObject interactable = new() { };
+            InteractableObject interactable = new()
+            {
+                Name = npcName
+            };
             AddComponent(entity, interactable);
         }
     }

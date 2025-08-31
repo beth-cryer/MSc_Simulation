@@ -21,16 +21,27 @@ public partial struct NPCSelectedUISystem : ISystem
             if (SystemAPI.HasComponent<QueuedAction>(entity))
             {
                 var action = SystemAPI.GetComponent<QueuedAction>(entity);
-                interactableName = SystemAPI.GetComponent<InteractableObject>(action.InteractionObject).Name.ToString();
+                
+                if (!SystemAPI.HasComponent<NPC>(action.InteractionObject))
+                    interactableName = SystemAPI.GetComponent<InteractableObject>(action.InteractionObject).Name.ToString();
+                else
+                    interactableName = "NPC #" + action.InteractionObject.Index;
 
                 // Either moving to the object or performing the action
                 if (SystemAPI.HasComponent<ActionPathfind>(entity))
-                    goal = string.Format("Moving to {0}", interactableName);
+                {
+                    var pathfind = SystemAPI.GetComponent<ActionPathfind>(entity);
+                    if (pathfind.DestinationReached)
+                        goal = string.Format("Waiting for {0} to be free", interactableName);
+                    else
+                        goal = string.Format("Moving to {0}", interactableName);
+                }
                 else
                     goal = string.Format("Interacting with {0}", interactableName);
             }
 
-            SelectedEntityUI.Instance.UpdateUI(npc.ValueRO, needsList, goal);
+            string npcName = "NPC #" + entity.Index.ToString();
+            SelectedEntityUI.Instance.UpdateUI(npc.ValueRO, needsList, npcName, goal);
         }
     }
 }

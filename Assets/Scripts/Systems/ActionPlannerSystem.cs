@@ -31,7 +31,7 @@ public partial struct ActionPlannerSystem : ISystem
         // Iterate over every NPC and process their action planning
         foreach (var (npc, npcTransform, needs, npcEntity)
             in SystemAPI.Query<RefRO<NPC>, RefRO<LocalTransform>, DynamicBuffer<NeedBuffer>>()
-            .WithNone<Interaction>()
+            .WithNone<ActionPathfind, Interaction, SocialRequest>()
             .WithEntityAccess())
         {
             float3 npcPos = npcTransform.ValueRO.Position;
@@ -47,6 +47,10 @@ public partial struct ActionPlannerSystem : ISystem
                 .WithNone<InUseTag, ActionPathfind>()
                 .WithEntityAccess())
             {
+                // Can't interact with yourself
+                if (objEntity.Equals(npcEntity))
+                    continue;
+
                 // For each need advertised:
                 // add (Curve Value of (NPC Need)) * Need Advertised
                 // add (100 - NPC Need) * Need Advertised,
@@ -114,9 +118,10 @@ public partial struct ActionPlannerSystem : ISystem
                                 break;
 
 
-                                //  TODO: WRITE SWITCH FOR CALCULATING WEIGHT OF EMOTION-DEPENDENT NEED
-                                //  (WILL BE BASED ON CLOSENESS OF CURRENT NEED VALUE TO NEED ADVERTISED)
-                                //  NeedRange - Abs(Distance between Mood values) * Intensity
+                            //  TODO: WRITE SWITCH FOR CALCULATING WEIGHT OF EMOTION-DEPENDENT NEED
+                            //  (WILL BE BASED ON CLOSENESS OF CURRENT NEED VALUE TO NEED ADVERTISED)
+                            //  NeedRange - Abs(Distance between Mood values) * Intensity
+                            //
                         }
 
                         // Get the advertised Need's scaling Curve, and evaluate position of the NPC's current Need value on the curve
@@ -135,9 +140,10 @@ public partial struct ActionPlannerSystem : ISystem
                     }
 
                     // Add distance from NPC
+                    // Get scaled value of the distance on our Distance Scaling Curve
                     float3 targetPos = objTransform.ValueRO.Position;
                     float distance = math.max(math.distance(npcPos, targetPos), 1.0f); //don't allow division by 0
-                    //Scale distance on curve
+                    
                     ref DistanceScalingData distanceScalingData = ref blobAsset.Value.DistanceScalingData;
                     float min = distanceScalingData.MinDistance;
                     float max = distanceScalingData.MaxDistance;
@@ -167,7 +173,10 @@ public partial struct ActionPlannerSystem : ISystem
             int randomIndex = PickWeightedValue(ref randomSingleton.ValueRW, ref weights, weightCount, sumOfWeights);
 
             ActionPathfind pathfind = new() {
+                DestinationEntity = weights[randomIndex].InteractableObjectEntity,
                 Destination = weights[randomIndex].Position,
+                RedirectAttempts = 3,
+                WaitForTargetToBeFree = 5.0f,
             };
             ecb.AddComponent(npcEntity, pathfind);  // note: AddComponent overwrites existing component if there is one
 
