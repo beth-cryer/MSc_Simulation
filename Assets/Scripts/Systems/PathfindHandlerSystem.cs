@@ -9,6 +9,7 @@ using UnityEngine;
 public partial struct PathfindHandlerSystem : ISystem
 {
 
+	[BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         EntityCommandBuffer ecb = new(Allocator.TempJob);
@@ -38,7 +39,8 @@ public partial struct PathfindHandlerSystem : ISystem
 
             // Check if the target moved since Pathfind component was created,
             var targetPositionCurrent = SystemAPI.GetComponent<LocalTransform>(action.ValueRO.InteractionObject);
-            Debug.Log("Me " + entity.Index.ToString() + ", Them " + action.ValueRO.InteractionObject.Index.ToString());
+            //Debug.Log("Me " + entity.Index.ToString() + ", Them " + action.ValueRO.InteractionObject.Index.ToString());
+
             if (math.distance(targetPos, targetPositionCurrent.Position) > 0.01f)
             {
                 // If so, try pathfind to it again until RedirectionAttempts are all used
@@ -67,15 +69,21 @@ public partial struct PathfindHandlerSystem : ISystem
                 // If the target has an Interaction component or InUseTag, wait a little while for it to be done
                 // And if it's an NPC, add a SocialRequest tag -
                 // This halts ActionPlannerSystem from running on it, allowing us to start the social interaction immediately
-                bool hasInteraction = SystemAPI.HasComponent<Interaction>(entity);
-                bool hasInUseTag = SystemAPI.HasComponent<InUseTag>(entity);
-                if (hasInteraction)
+                bool targetHasInteraction = SystemAPI.HasComponent<Interaction>(action.ValueRO.InteractionObject);
+                bool targetHasInUseTag = SystemAPI.HasComponent<InUseTag>(action.ValueRO.InteractionObject);
+                bool targetIsNPC = SystemAPI.HasComponent<NPC>(action.ValueRO.InteractionObject);
+                if (targetIsNPC && targetHasInteraction)
                 {
                     SocialRequest socialRequest = new();
                     ecb.AddComponent(action.ValueRO.InteractionObject, socialRequest);
                 }
-                
-                if (!hasInteraction && !hasInUseTag)
+                else
+                {
+                    ecb.RemoveComponent<ActionPathfind>(entity);
+                    ecb.RemoveComponent<QueuedAction>(entity);
+                }
+
+                if (!targetHasInteraction && !targetHasInUseTag)
                 {
                     // Add (or update) Interaction component to the NPC
                     // Action Handler System will iterate all Interaction components and execute their function

@@ -23,23 +23,9 @@ public partial struct QueuedActionHandlerSystem : ISystem
             if (!pathfinding.ValueRO.DestinationReached)
                 continue;
 
-            // If we've waited long enough to exhaust our NPC's patience,
-            // Give up and remove action from this entity, and remove SocialRequest from the destination entity if relevant
-            if (pathfinding.ValueRO.WaitForTargetToBeFree <= 0.0f)
-            {
-                ecb.RemoveComponent<ActionPathfind>(entity);
-                ecb.RemoveComponent<QueuedAction>(entity);
-
-                if (SystemAPI.HasComponent<SocialRequest>(pathfinding.ValueRO.DestinationEntity))
-                    ecb.RemoveComponent<SocialRequest>(pathfinding.ValueRO.DestinationEntity);
-
-                continue;
-            }
-            pathfinding.ValueRW.WaitForTargetToBeFree -= SystemAPI.Time.DeltaTime;
-
-            // Check if target entity has become free
-            bool hasInteraction = SystemAPI.HasComponent<Interaction>(entity);
-            bool hasInUseTag = SystemAPI.HasComponent<InUseTag>(entity);
+			// Check if target entity has become free
+			bool hasInteraction = SystemAPI.HasComponent<Interaction>(pathfinding.ValueRO.DestinationEntity);
+            bool hasInUseTag = SystemAPI.HasComponent<InUseTag>(pathfinding.ValueRO.DestinationEntity);
             if (!hasInteraction && !hasInUseTag)
             {
                 // Add (or update) Interaction component to the NPC
@@ -58,10 +44,24 @@ public partial struct QueuedActionHandlerSystem : ISystem
 
                 Interaction npcIsInteracting = new() { InteractionObject = action.ValueRO.InteractionObject };
                 ecb.AddComponent(entity, npcIsInteracting);
-
-                // (AddComponent won't replace an existing component, so if there does end up being an InUseTag already it's fine_
-                // (we'll just have the ActionHandlerSystem double-check it's the right entity and remove its Action component if not)
             }
+
+            // (AddComponent won't replace an existing component, so if there does end up being an InUseTag already it's fine_
+            // (we'll just have the ActionHandlerSystem double-check it's the right entity and remove its Action component if not)
+
+            // If we've waited long enough to exhaust our NPC's patience,
+            // Give up and remove action from this entity, and remove SocialRequest from the destination entity if relevant
+            if (pathfinding.ValueRO.WaitForTargetToBeFree <= 0.0f)
+            {
+                ecb.RemoveComponent<ActionPathfind>(entity);
+                ecb.RemoveComponent<QueuedAction>(entity);
+
+                if (SystemAPI.HasComponent<SocialRequest>(pathfinding.ValueRO.DestinationEntity))
+                    ecb.RemoveComponent<SocialRequest>(pathfinding.ValueRO.DestinationEntity);
+
+                continue;
+            }
+            pathfinding.ValueRW.WaitForTargetToBeFree -= SystemAPI.Time.DeltaTime;
         }
 
         ecb.Playback(state.EntityManager);

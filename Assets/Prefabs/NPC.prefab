@@ -114,8 +114,8 @@ MonoBehaviour:
         x: 10
         y: 0
         z: 0
-      InteractDuration: 3
-      MinInteractDuration: 3
+      InteractDuration: 5
+      MinInteractDuration: 5
       RequiredToCompleteAction: 1
   NeedsAdvertised:
   - Type: 0

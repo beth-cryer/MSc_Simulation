@@ -21,7 +21,7 @@ public partial struct NPCSelectedUISystem : ISystem
             if (SystemAPI.HasComponent<QueuedAction>(entity))
             {
                 var action = SystemAPI.GetComponent<QueuedAction>(entity);
-                
+
                 if (!SystemAPI.HasComponent<NPC>(action.InteractionObject))
                     interactableName = SystemAPI.GetComponent<InteractableObject>(action.InteractionObject).Name.ToString();
                 else
@@ -39,9 +39,26 @@ public partial struct NPCSelectedUISystem : ISystem
                 else
                     goal = string.Format("Interacting with {0}", interactableName);
             }
+            else
+            if (SystemAPI.HasComponent<Interaction>(entity))
+            {
+                var action = SystemAPI.GetComponent<Interaction>(entity);
+
+                if (!SystemAPI.HasComponent<NPC>(action.InteractionObject))
+                    interactableName = SystemAPI.GetComponent<InteractableObject>(action.InteractionObject).Name.ToString();
+                else
+                    interactableName = "NPC #" + action.InteractionObject.Index;
+
+                if (!SystemAPI.HasComponent<ActionPathfind>(entity))
+                {
+                    goal = string.Format("Interacting with {0}", interactableName);
+                }
+            }
 
             string npcName = "NPC #" + entity.Index.ToString();
             SelectedEntityUI.Instance.UpdateUI(npc.ValueRO, needsList, npcName, goal);
+
         }
+
     }
 }

@@ -23,7 +23,7 @@ public partial struct ActionHandlerSystem : ISystem
         foreach (var (npc, needs, actions, interaction, entity) in
             SystemAPI.Query<RefRO<NPC>, DynamicBuffer<NeedBuffer>, DynamicBuffer<InteractionBuffer>, RefRW<Interaction>>()
             .WithNone<ActionPathfind>()
-            .WithEntityAccess())
+			.WithEntityAccess())
         {
             /* This is silly, I think we can used ComponentGroups to accomplish what i was thinking with this.
              * TODO; look into that
