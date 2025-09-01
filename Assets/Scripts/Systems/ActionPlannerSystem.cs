@@ -17,7 +17,7 @@ public partial struct ActionPlannerSystem : ISystem
 		state.RequireForUpdate<RandomSingleton>();
 	}
 
-
+	[BurstCompile]
 	public void OnUpdate(ref SystemState state)
 	{
 		Debug.Log("AI update tick");
@@ -29,15 +29,15 @@ public partial struct ActionPlannerSystem : ISystem
 		EntityCommandBuffer ecb = new(Allocator.TempJob);
 
 		// Iterate over every NPC and process their action planning
-		foreach (var (npc, npcTransform, needs, npcEntity)
-			in SystemAPI.Query<RefRO<NPC>, RefRO<LocalTransform>, DynamicBuffer<NeedBuffer>>()
+		foreach (var (npc, npcTransform, needs, traits, npcEntity)
+			in SystemAPI.Query<RefRO<NPC>, RefRO<LocalTransform>, DynamicBuffer<NeedBuffer>, DynamicBuffer<TraitBuffer>>()
 			.WithNone<ActionPathfind, Interaction, SocialRequest>()
 			.WithEntityAccess())
 		{
 			float3 npcPos = npcTransform.ValueRO.Position;
 
 			// TODO: Maintain a count of all interactables in a singleton somewhere
-			NativeArray<WeightedAction> weights = new(20, Allocator.TempJob);
+			NativeArray<WeightedAction> weights = new(10000, Allocator.TempJob);
 			int weightCount = 0;
 			float sumOfWeights = 0;
 
@@ -82,6 +82,8 @@ public partial struct ActionPlannerSystem : ISystem
 						if (!currentNeed.HasValue) continue; //if needAdvertised doesn't exist on the NPC, skip it
 						if (currentNeed.Value.Value[0] == needData.MaxValue[0]) continue; //if need is already at max value, skip it
 
+						float3 currentNeedValue = currentNeed.Value.Value;
+
 						// Value should be the value per second spent doing the action
 						// So get the projected end Need value of the Action, and divide by Duration
 						float advertisedValue = 0.0f;
@@ -99,11 +101,11 @@ public partial struct ActionPlannerSystem : ISystem
 								// If Duration is set, check if we'll reach MaxValue by the end of the Action's duration
 								if (needAdvertised.InteractDuration != 0f)
 								{
-									endResult = currentNeed.Value.Value + (needAdvertised.NeedValueChange * needAdvertised.InteractDuration);
+									endResult = currentNeedValue + (needAdvertised.NeedValueChange * needAdvertised.InteractDuration);
 									if (endResult[0] < needData.MaxValue[0])
 									{
 										// If we won't, then just use the end result
-										advertisedValue = (endResult[0] - currentNeed.Value.Value[0]) / needAdvertised.InteractDuration;
+										advertisedValue = (endResult[0] - currentNeedValue[0]) / needAdvertised.InteractDuration;
 										break;
 									}
 								}
@@ -124,17 +126,26 @@ public partial struct ActionPlannerSystem : ISystem
 							//
 						}
 
+						// Add trait modifiers to current need value
+						foreach (var trait in traits)
+						{
+							if (trait.NeedModifier.Type != needAdvertised.Need.Type)
+								continue;
+							currentNeedValue += trait.NeedModifier.Value;
+						}
+						currentNeedValue = math.clamp(currentNeedValue, needData.MinValue, needData.MaxValue);
+
 						// Get the advertised Need's scaling Curve, and evaluate position of the NPC's current Need value on the curve
 						// (needMax - currentNeed) / needMax
-						float currentNeedValue = math.clamp((needData.MaxValue - currentNeed.Value.Value) / needData.MaxValue, 0f, 1f)[0];
-						int curveIndex = (int)math.round(currentNeedValue * 99f);
+						float modifiedNeedValue = math.clamp((needData.MaxValue - currentNeedValue) / needData.MaxValue, 0f, 1f)[0];
+						int curveIndex = (int)math.round(modifiedNeedValue * 99f);
 						float curveValue = needData.Curve[curveIndex];
 
 						weightedValue += advertisedValue * curveValue;
 
 						
-						Debug.Log(string.Format("need = {0}, weighted value = {1}, advertisedValue = {2} currentNeedValue = {3}, curveIndex = {4}, curveValue = {5}",
-							needAdvertised.Need.Type.ToString(), weightedValue, advertisedValue, currentNeedValue, curveIndex, curveValue));
+						//Debug.Log(string.Format("need = {0}, weighted value = {1}, advertisedValue = {2} currentNeedValue = {3}, curveIndex = {4}, curveValue = {5}",
+						//	needAdvertised.Need.Type.ToString(), weightedValue, advertisedValue, currentNeedValue, curveIndex, curveValue));
 						
 					}
 

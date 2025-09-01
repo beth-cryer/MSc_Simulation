@@ -44,4 +44,4 @@ MonoBehaviour:
       InteractDuration: 0
       MinInteractDuration: 0
       RequiredToCompleteAction: 0
-  InteractDistance: 1
+  InteractDistance: 0.7

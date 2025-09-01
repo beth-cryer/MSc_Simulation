@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: House
       objectReference: {fileID: 0}
+    - target: {fileID: 3661405651164700961, guid: dac64a7937e8be14684c16829fdefe74, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8747046628712392736, guid: dac64a7937e8be14684c16829fdefe74, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.25
@@ -199,6 +203,10 @@ PrefabInstance:
     - target: {fileID: 3661405651164700961, guid: dac64a7937e8be14684c16829fdefe74, type: 3}
       propertyPath: m_Name
       value: House
+      objectReference: {fileID: 0}
+    - target: {fileID: 3661405651164700961, guid: dac64a7937e8be14684c16829fdefe74, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3715742424887122067, guid: dac64a7937e8be14684c16829fdefe74, type: 3}
       propertyPath: m_Sprite
@@ -374,7 +382,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NPCPrefab: {fileID: 9098243305692466381, guid: d401c4d688ec27d4c99cd8bed62ed769, type: 3}
-  SpawnAmount: 5
+  SpawnAmount: 100
 --- !u!1 &2035598958
 GameObject:
   m_ObjectHideFlags: 0
@@ -447,6 +455,10 @@ PrefabInstance:
     - target: {fileID: 3661405651164700961, guid: dac64a7937e8be14684c16829fdefe74, type: 3}
       propertyPath: m_Name
       value: House
+      objectReference: {fileID: 0}
+    - target: {fileID: 3661405651164700961, guid: dac64a7937e8be14684c16829fdefe74, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3899415929444280695, guid: dac64a7937e8be14684c16829fdefe74, type: 3}
       propertyPath: m_Sprite

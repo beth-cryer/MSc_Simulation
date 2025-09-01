@@ -69,7 +69,7 @@ public class NPCAgentAuthoring: MonoBehaviour
 			InteractableObject interactable = new()
 			{
 				Name = npcName,
-				InteractDistance = 0.5f
+				InteractDistance = 0.7f
 			};
             AddComponent(entity, interactable);
         }
