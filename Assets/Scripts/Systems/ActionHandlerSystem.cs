@@ -46,36 +46,38 @@ public partial struct ActionHandlerSystem : ISystem
             // Move need towards target value gradually
             foreach (InteractionBuffer actionBuffer in actions)
             {
-                if (actionBuffer.RequiredToCompleteAction && !actionBuffer.Complete)
+				Action action = actionBuffer.Details;
+
+                if (action.RequiredToCompleteAction && !actionBuffer.Complete)
                     isActionFinished = false;
 
                 if (actionBuffer.Complete)
                     break;
 
-                switch (actionBuffer.ActionType)
+                switch (action.ActionType)
                 {
                     case (EActionType.ModifyNeed):
                         for (int n = 0; n < newNeeds.Length; n++)
                         {
-                            if (newNeeds[n].Need.Type == actionBuffer.NeedAction.Type)
+                            if (newNeeds[n].Need.Type == action.Need.Type)
                             {
                                 Need alteredNeed = newNeeds[n].Need;
                                 float3 current = newNeeds[n].Need.Value;
-                                float3 target = actionBuffer.NeedAction.Value;
+                                float3 target = action.Need.Value;
 
                                 ref var needData = ref blobAsset.Value.NeedsData[(int)alteredNeed.Type];
 
-                                alteredNeed.Value = math.clamp(alteredNeed.Value + actionBuffer.NeedValueChange * SystemAPI.Time.DeltaTime,
+                                alteredNeed.Value = math.clamp(alteredNeed.Value + action.NeedValueChange * SystemAPI.Time.DeltaTime,
                                     needData.MinValue,
                                     needData.MaxValue);
 
-                                if (interaction.ValueRO.TimeElapsed >= actionBuffer.MinInteractDuration &&
-                                    ((actionBuffer.InteractDuration > 0 && interaction.ValueRO.TimeElapsed >= actionBuffer.InteractDuration)
+                                if (interaction.ValueRO.TimeElapsed >= action.MinInteractDuration &&
+                                    ((action.InteractDuration > 0 && interaction.ValueRO.TimeElapsed >= action.InteractDuration)
                                     || math.all(alteredNeed.Value == needData.MaxValue)
                                     || math.all(alteredNeed.Value == needData.MinValue)))
                                 {
                                     // Set as complete in InteractionBuffer
-                                    SetComplete(ref ecb, entity, actions, actionBuffer);
+                                    SetComplete(ref ecb, entity, actions, action);
                                 }
 
                                 newNeeds[n] = new() { Need = alteredNeed };
@@ -83,20 +85,20 @@ public partial struct ActionHandlerSystem : ISystem
                         }
                         break;
                     case (EActionType.SetNeed):
-                        if (interaction.ValueRO.TimeElapsed < actionBuffer.InteractDuration)
+                        if (interaction.ValueRO.TimeElapsed < action.InteractDuration)
                             break;
 
                         // Set need to target value
                         for (int i = 0; i < newNeeds.Length; i++)
                         {
                             Need alteredNeed = newNeeds[i].Need;
-                            if (alteredNeed.Type == actionBuffer.NeedAction.Type)
-                                alteredNeed.Value = actionBuffer.NeedAction.Value;
+                            if (alteredNeed.Type == action.Need.Type)
+                                alteredNeed.Value = action.Need.Value;
                             newNeeds[i] = new() { Need = alteredNeed };
                         }
 
                         // Set as complete in InteractionBuffer
-                        SetComplete(ref ecb, entity, actions, actionBuffer);
+                        SetComplete(ref ecb, entity, actions, action);
                         break;
 
                     /*
@@ -156,13 +158,13 @@ public partial struct ActionHandlerSystem : ISystem
     }
 
     [BurstCompile]
-    public void SetComplete(ref EntityCommandBuffer ecb, Entity entity, DynamicBuffer<InteractionBuffer> actions, InteractionBuffer actionBuffer)
+    public void SetComplete(ref EntityCommandBuffer ecb, Entity entity, DynamicBuffer<InteractionBuffer> actions, Action action)
     {
         DynamicBuffer<InteractionBuffer> newActionBufferSet = ecb.SetBuffer<InteractionBuffer>(entity);
         for (int i = 0; i < actions.Length; i++)
         {
             InteractionBuffer newAction = actions[i];
-            if (actions[i].NeedAction.Type == actionBuffer.NeedAction.Type)
+            if (actions[i].Details.Need.Type == action.Need.Type)
                 newAction.Complete = true;
 
             newActionBufferSet.Add(newAction);

@@ -12,12 +12,7 @@ public struct Interaction: IComponentData
 [InternalBufferCapacity(8)]
 public struct InteractionBuffer : IBufferElementData
 {
-    public Need NeedAction;
-    public EActionType ActionType;
-    public float3 NeedValueChange; // amount to move Need value by (per second). ignored if 0
-    public float InteractDuration;
-    public float MinInteractDuration;
-    public bool RequiredToCompleteAction;
+	public Action Details;
     public bool Complete;
 }
 

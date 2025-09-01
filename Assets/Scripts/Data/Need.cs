@@ -28,10 +28,15 @@ public struct NeedBuffer : IBufferElementData
 [InternalBufferCapacity(8)]
 public struct NeedAdvertisementBuffer : IBufferElementData
 {
-    public Need NeedAdvertised;
-    public EActionType ActionType;
-    public float3 NeedValueChange;
-    public float InteractDuration;
-    public float MinInteractDuration;
-    public bool RequiredToCompleteAction;
+	public Action Details;
+}
+
+public struct Action
+{
+	public Need Need;
+	public EActionType ActionType;
+	public float3 NeedValueChange; // amount to move Need value by (per second). ignored if 0
+	public float InteractDuration;
+	public float MinInteractDuration;
+	public bool RequiredToCompleteAction;
 }

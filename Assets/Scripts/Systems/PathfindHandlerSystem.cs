@@ -17,6 +17,7 @@ public partial struct PathfindHandlerSystem : ISystem
         // Pathfinding
         foreach (var (npc, npcTransform, pathfinding, action, entity)
             in SystemAPI.Query<RefRO<NPC>, RefRW<LocalTransform>, RefRW<ActionPathfind>, RefRO<QueuedAction>>()
+			.WithNone<SocialRequest>()
             .WithEntityAccess())
         {
             if (pathfinding.ValueRO.DestinationReached)
@@ -27,7 +28,7 @@ public partial struct PathfindHandlerSystem : ISystem
 
             // Keep moving to target until in range for action
             float distanceToTarget = math.distance(npcPos, targetPos);
-            if (distanceToTarget > 0.01f)
+            if (distanceToTarget > pathfinding.ValueRO.InteractDistance)
             {
                 float3 newPos;
                 MathHelpers.MoveTowards(ref npcPos, ref targetPos, npc.ValueRO.Speed * SystemAPI.Time.DeltaTime, out newPos);
@@ -41,7 +42,7 @@ public partial struct PathfindHandlerSystem : ISystem
             var targetPositionCurrent = SystemAPI.GetComponent<LocalTransform>(action.ValueRO.InteractionObject);
             //Debug.Log("Me " + entity.Index.ToString() + ", Them " + action.ValueRO.InteractionObject.Index.ToString());
 
-            if (math.distance(targetPos, targetPositionCurrent.Position) > 0.01f)
+            if (math.distance(targetPos, targetPositionCurrent.Position) > pathfinding.ValueRO.InteractDistance)
             {
                 // If so, try pathfind to it again until RedirectionAttempts are all used
                 if (pathfinding.ValueRO.RedirectAttempts > 0)
@@ -72,7 +73,7 @@ public partial struct PathfindHandlerSystem : ISystem
                 bool targetHasInteraction = SystemAPI.HasComponent<Interaction>(action.ValueRO.InteractionObject);
                 bool targetHasInUseTag = SystemAPI.HasComponent<InUseTag>(action.ValueRO.InteractionObject);
                 bool targetIsNPC = SystemAPI.HasComponent<NPC>(action.ValueRO.InteractionObject);
-                if (targetIsNPC && targetHasInteraction)
+                if (targetIsNPC)
                 {
                     SocialRequest socialRequest = new();
                     ecb.AddComponent(action.ValueRO.InteractionObject, socialRequest);

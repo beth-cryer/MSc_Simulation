@@ -52,21 +52,25 @@ public class NPCAgentAuthoring: MonoBehaviour
                 {
                     needsAdvertised.Add(new()
                     {
-                        NeedAdvertised = need.NeedAdvertised,
-                        ActionType = need.ActionType,
-                        NeedValueChange = need.NeedValueChange,
-                        InteractDuration = need.InteractDuration,
-                        MinInteractDuration = need.MinInteractDuration,
-                        RequiredToCompleteAction = need.RequiredToCompleteAction,
+						Details = new()
+						{
+							Need = need.NeedAdvertised,
+							ActionType = need.ActionType,
+							NeedValueChange = need.NeedValueChange,
+							InteractDuration = need.InteractDuration,
+							MinInteractDuration = need.MinInteractDuration,
+							RequiredToCompleteAction = need.RequiredToCompleteAction,
+						}
                     });
                     i++;
                 }
             }
 
-            InteractableObject interactable = new()
-            {
-                Name = npcName
-            };
+			InteractableObject interactable = new()
+			{
+				Name = npcName,
+				InteractDistance = 0.5f
+			};
             AddComponent(entity, interactable);
         }
     }

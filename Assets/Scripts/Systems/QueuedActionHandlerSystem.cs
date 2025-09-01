@@ -23,9 +23,11 @@ public partial struct QueuedActionHandlerSystem : ISystem
             if (!pathfinding.ValueRO.DestinationReached)
                 continue;
 
+			Entity destinationEntity = pathfinding.ValueRO.DestinationEntity;
+
 			// Check if target entity has become free
-			bool hasInteraction = SystemAPI.HasComponent<Interaction>(pathfinding.ValueRO.DestinationEntity);
-            bool hasInUseTag = SystemAPI.HasComponent<InUseTag>(pathfinding.ValueRO.DestinationEntity);
+			bool hasInteraction = SystemAPI.HasComponent<Interaction>(destinationEntity);
+            bool hasInUseTag = SystemAPI.HasComponent<InUseTag>(destinationEntity);
             if (!hasInteraction && !hasInUseTag)
             {
                 // Add (or update) Interaction component to the NPC
@@ -39,8 +41,8 @@ public partial struct QueuedActionHandlerSystem : ISystem
                 InUseTag inUse = new() { InteractingNPC = entity };
                 ecb.AddComponent(action.ValueRO.InteractionObject, inUse);
 
-                if (SystemAPI.HasComponent<SocialRequest>(pathfinding.ValueRO.DestinationEntity))
-                    ecb.RemoveComponent<SocialRequest>(pathfinding.ValueRO.DestinationEntity);
+                if (SystemAPI.HasComponent<SocialRequest>(destinationEntity))
+                    ecb.RemoveComponent<SocialRequest>(destinationEntity);
 
                 Interaction npcIsInteracting = new() { InteractionObject = action.ValueRO.InteractionObject };
                 ecb.AddComponent(entity, npcIsInteracting);
@@ -56,8 +58,8 @@ public partial struct QueuedActionHandlerSystem : ISystem
                 ecb.RemoveComponent<ActionPathfind>(entity);
                 ecb.RemoveComponent<QueuedAction>(entity);
 
-                if (SystemAPI.HasComponent<SocialRequest>(pathfinding.ValueRO.DestinationEntity))
-                    ecb.RemoveComponent<SocialRequest>(pathfinding.ValueRO.DestinationEntity);
+                if (SystemAPI.HasComponent<SocialRequest>(destinationEntity))
+                    ecb.RemoveComponent<SocialRequest>(destinationEntity);
 
                 continue;
             }

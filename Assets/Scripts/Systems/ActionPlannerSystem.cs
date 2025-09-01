@@ -17,7 +17,7 @@ public partial struct ActionPlannerSystem : ISystem
 		state.RequireForUpdate<RandomSingleton>();
 	}
 
-	[BurstCompile]
+
 	public void OnUpdate(ref SystemState state)
 	{
 		Debug.Log("AI update tick");
@@ -64,20 +64,20 @@ public partial struct ActionPlannerSystem : ISystem
 						i < actionAdvertised.NeedAdvertisedIndex + actionAdvertised.NeedAdvertisedCount;
 						i++)
 					{
-						NeedAdvertisementBuffer needAdvertised = needsAdvertised[i];
+						Action needAdvertised = needsAdvertised[i].Details;
 
 						// Get the current value from the NPC of the Need that this is advertising
 						Nullable<Need> currentNeed = null;
 						foreach (NeedBuffer findNeed in needs)
 						{
-							if (findNeed.Need.Type == needAdvertised.NeedAdvertised.Type)
+							if (findNeed.Need.Type == needAdvertised.Need.Type)
 							{
 								currentNeed = findNeed.Need;
 								break;
 							}
 						}
 
-						ref var needData = ref blobAsset.Value.NeedsData[(int)needAdvertised.NeedAdvertised.Type];
+						ref var needData = ref blobAsset.Value.NeedsData[(int)needAdvertised.Need.Type];
 
 						if (!currentNeed.HasValue) continue; //if needAdvertised doesn't exist on the NPC, skip it
 						if (currentNeed.Value.Value[0] == needData.MaxValue[0]) continue; //if need is already at max value, skip it
@@ -90,7 +90,7 @@ public partial struct ActionPlannerSystem : ISystem
 						{
 							case (EActionType.SetNeed):
 								if (needAdvertised.InteractDuration == 0) continue; // if this happens then the interaction is configured wrong
-								endResult = needAdvertised.NeedAdvertised.Value;
+								endResult = needAdvertised.Need.Value;
 								advertisedValue = endResult[0] / needAdvertised.InteractDuration;
 								break;
 							case (EActionType.ModifyNeed):
@@ -132,10 +132,10 @@ public partial struct ActionPlannerSystem : ISystem
 
 						weightedValue += advertisedValue * curveValue;
 
-						/*
+						
 						Debug.Log(string.Format("need = {0}, weighted value = {1}, advertisedValue = {2} currentNeedValue = {3}, curveIndex = {4}, curveValue = {5}",
-							needAdvertised.NeedAdvertised.Type.ToString(), weightedValue, advertisedValue, currentNeedValue, curveIndex, curveValue));
-						*/
+							needAdvertised.Need.Type.ToString(), weightedValue, advertisedValue, currentNeedValue, curveIndex, curveValue));
+						
 					}
 
 					// Add distance from NPC
@@ -160,6 +160,7 @@ public partial struct ActionPlannerSystem : ISystem
 						InteractableObject = obj.ValueRO,
 						Buffer = needsAdvertised,
 						Position = objTransform.ValueRO.Position,
+						InteractDistance = obj.ValueRO.InteractDistance,
 						Weight = weightedValue
 					};
 					weightCount++;
@@ -168,12 +169,19 @@ public partial struct ActionPlannerSystem : ISystem
 
 			//Debug.Log(string.Format("checked {0} possibilites", weightCount));
 
+			if (weightCount == 0)
+			{
+				weights.Dispose();
+				continue;
+			}
+
 			// Randomly pick from weighted list
 			int randomIndex = PickWeightedValue(ref randomSingleton.ValueRW, ref weights, weightCount, sumOfWeights);
 
 			ActionPathfind pathfind = new() {
 				DestinationEntity = weights[randomIndex].InteractableObjectEntity,
 				Destination = weights[randomIndex].Position,
+				InteractDistance = weights[randomIndex].InteractDistance,
 				RedirectAttempts = 3,
 				WaitForTargetToBeFree = 5.0f,
 			};
@@ -191,12 +199,7 @@ public partial struct ActionPlannerSystem : ISystem
 			{
 				actionBuffer.Add(new()
 				{
-					NeedAction = needAdvertised.NeedAdvertised,
-					ActionType = needAdvertised.ActionType,
-					NeedValueChange = needAdvertised.NeedValueChange,
-					InteractDuration = needAdvertised.InteractDuration,
-					MinInteractDuration = needAdvertised.MinInteractDuration,
-					RequiredToCompleteAction = needAdvertised.RequiredToCompleteAction,
+					Details = needAdvertised.Details,
 				});
 			}
 
@@ -217,7 +220,6 @@ public partial struct ActionPlannerSystem : ISystem
 				return i;
 			r -= weights[i].Weight;
 		}
-
 		return 0;
 	}
 }
@@ -227,6 +229,7 @@ struct WeightedAction
 	public DynamicBuffer<NeedAdvertisementBuffer> Buffer;
 	public InteractableObject InteractableObject;
 	public float3 Position;
+	public float InteractDistance;
 	public float Weight;
 	public Entity InteractableObjectEntity;
 }

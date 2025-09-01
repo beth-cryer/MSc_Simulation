@@ -9,6 +9,7 @@ public class ObjectData: ScriptableObject
     public string Name;
     public Sprite Sprite;
     public List<ActionAdvertised> ActionsAdvertised;
+	public float InteractDistance = 0.01f;
 }
 
 [Serializable]

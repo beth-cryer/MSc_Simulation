@@ -17,6 +17,8 @@ public class InteractableObjectAuthoring : MonoBehaviour
             InteractableObject obj = new()
             {
                 Name = new FixedString32Bytes(authoring.ObjectData.Name),
+				InteractDistance = authoring.ObjectData.InteractDistance,
+				
             };
             AddComponent(entity, obj);
 
@@ -37,12 +39,15 @@ public class InteractableObjectAuthoring : MonoBehaviour
                 {
                     needsAdvertised.Add(new()
                     {
-                        NeedAdvertised = need.NeedAdvertised,
-                        ActionType = need.ActionType,
-                        NeedValueChange = need.NeedValueChange,
-                        InteractDuration = need.InteractDuration,
-                        MinInteractDuration = need.MinInteractDuration,
-                        RequiredToCompleteAction = need.RequiredToCompleteAction,
+						Details = new()
+						{
+							Need = need.NeedAdvertised,
+							ActionType = need.ActionType,
+							NeedValueChange = need.NeedValueChange,
+							InteractDuration = need.InteractDuration,
+							MinInteractDuration = need.MinInteractDuration,
+							RequiredToCompleteAction = need.RequiredToCompleteAction,
+						}
                     });
                     i++;
                 }

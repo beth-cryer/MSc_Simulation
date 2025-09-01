@@ -374,7 +374,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NPCPrefab: {fileID: 9098243305692466381, guid: d401c4d688ec27d4c99cd8bed62ed769, type: 3}
-  SpawnAmount: 2
+  SpawnAmount: 5
 --- !u!1 &2035598958
 GameObject:
   m_ObjectHideFlags: 0
