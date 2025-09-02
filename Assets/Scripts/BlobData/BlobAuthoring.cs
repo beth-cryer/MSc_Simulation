@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
 using Unity.Entities;
@@ -55,9 +56,30 @@ public class BlobAuthoring: MonoBehaviour
                 AnimationCurveToArray(NeedData[i].Curve, ref curve, sampleSize);
             }
 
-            // Add Blob Data to Singleton so it can be accessed by systems
+			// Load Traits Data
+			TraitData[] TraitData = Resources.LoadAll<TraitData>("Data/Traits/");
+			BlobBuilderArray<TraitsData> traitsArray = blobBuilder.Allocate(ref blobAsset.TraitsData, TraitData.Length);
+			for (int i = 0; i < TraitData.Length; i++)
+			{
+				int index = (int)TraitData[i].Type;
+				traitsArray[index] = new()
+				{
+					Trait = new()
+					{
+						NeedModifier = new()
+						{
+							Type = TraitData[i].NeedModifiers[0].Need,
+							Value = TraitData[i].NeedModifiers[0].Modifier,
+						},
+						Type = TraitData[i].Type,
+					}
+				};
+			}
 
-            var blobReference = blobBuilder.CreateBlobAssetReference<ObjectsBlobAsset>(Allocator.Persistent);
+			// 
+
+			// Add Blob Data to Singleton so it can be accessed by systems
+			var blobReference = blobBuilder.CreateBlobAssetReference<ObjectsBlobAsset>(Allocator.Persistent);
             blobBuilder.Dispose();
 
             AddBlobAsset(ref blobReference, out var hash);

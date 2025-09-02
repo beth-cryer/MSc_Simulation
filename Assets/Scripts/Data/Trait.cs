@@ -3,6 +3,11 @@ using Unity.Entities;
 [InternalBufferCapacity(4)]
 public struct TraitBuffer: IBufferElementData
 {
+	public Trait Trait;
+}
+
+public struct Trait
+{
 	public ETrait Type;
 
 	// When running ActionPlanner, modify current value of Need by this amount
@@ -12,7 +17,6 @@ public struct TraitBuffer: IBufferElementData
 
 public enum ETrait
 {
-	None = 0,
 	Sleepy,
 	Glutton,
 	Outdoorsy,

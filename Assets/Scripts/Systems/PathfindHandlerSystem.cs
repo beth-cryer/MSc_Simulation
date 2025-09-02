@@ -36,7 +36,7 @@ public partial struct PathfindHandlerSystem : ISystem
                 continue;
             }
 
-            Debug.Log("At destination");
+            //Debug.Log("At destination");
 
             // Check if the target moved since Pathfind component was created,
             var targetPositionCurrent = SystemAPI.GetComponent<LocalTransform>(action.ValueRO.InteractionObject);

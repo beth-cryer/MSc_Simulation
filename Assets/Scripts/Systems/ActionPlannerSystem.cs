@@ -129,9 +129,9 @@ public partial struct ActionPlannerSystem : ISystem
 						// Add trait modifiers to current need value
 						foreach (var trait in traits)
 						{
-							if (trait.NeedModifier.Type != needAdvertised.Need.Type)
+							if (trait.Trait.NeedModifier.Type != needAdvertised.Need.Type)
 								continue;
-							currentNeedValue += trait.NeedModifier.Value;
+							currentNeedValue += trait.Trait.NeedModifier.Value;
 						}
 						currentNeedValue = math.clamp(currentNeedValue, needData.MinValue, needData.MaxValue);
 

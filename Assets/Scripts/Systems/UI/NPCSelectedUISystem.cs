@@ -6,15 +6,19 @@ public partial struct NPCSelectedUISystem : ISystem
 {
     public void OnUpdate(ref SystemState state)
     {
-        foreach (var (npc, needs, selected, entity)
-            in SystemAPI.Query<RefRO<NPC>, DynamicBuffer<NeedBuffer>, RefRO<SelectedEntityTag>>()
+        foreach (var (npc, needs, traits, selected, entity)
+            in SystemAPI.Query<RefRO<NPC>, DynamicBuffer<NeedBuffer>, DynamicBuffer<TraitBuffer>, RefRO<SelectedEntityTag>>()
             .WithEntityAccess())
         {
             List<Need> needsList = new();
             for (int i = 0; i < needs.Length; i++)
                 needsList.Add(needs[i].Need);
 
-            string goal  = "None";
+			List<Trait> traitsList = new();
+			for (int i = 0; i < traits.Length; i++)
+				traitsList.Add(traits[i].Trait);
+
+			string goal  = "None";
             string interactableName = "?";
 
             // Find object we are interacting with
@@ -56,7 +60,7 @@ public partial struct NPCSelectedUISystem : ISystem
             }
 
             string npcName = "NPC #" + entity.Index.ToString();
-            SelectedEntityUI.Instance.UpdateUI(npc.ValueRO, needsList, npcName, goal);
+            SelectedEntityUI.Instance.UpdateUI(npc.ValueRO, needsList, traitsList, npcName, goal);
 
         }
 

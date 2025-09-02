@@ -9,20 +9,33 @@ public class SelectedEntityUI : MonoBehaviour
 {
     [SerializeField] private GameObject m_prefab_needBar;
     [SerializeField] private TMP_Text m_text;
+	[SerializeField] private TMP_Text m_textTraits;
     [SerializeField] private Transform m_needsLayoutGroup;
     public NPC DisplayedNPC;
     public List<Need> DisplayedNeeds;
 
     private NeedData[] m_needData;
+    private TraitData[] m_traitData;
 
     private void Start()
     {
         m_needData = Resources.LoadAll<NeedData>("Data/Needs/");
-    }
+		m_traitData = Resources.LoadAll<TraitData>("Data/Traits/");
+	}
 
-    public void UpdateUI(NPC npc, List<Need> needs, string name, string goal)
+    public void UpdateUI(NPC npc, List<Need> needs, List<Trait> traits, string name, string goal)
     {
         string text = string.Format("{0}\n\nGOAL:\n{1}", name, goal);
+		string textTraits = "";
+		foreach (var trait in traits)
+		{
+			TraitData traitData = m_traitData.FirstOrDefault(x => x.Type.Equals(trait.Type));
+			if (traitData == null)
+				continue;
+
+			textTraits += traitData.Name + "\n";
+		}
+		m_textTraits.SetText(textTraits);
 
         // Needs bars-
         // Check how many there are in children, add extras if needed

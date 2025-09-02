@@ -35,8 +35,10 @@ public class NPCAgentAuthoring: MonoBehaviour
 
             AddComponent(entity, npc);
 
-            // Add Social Actions
-            DynamicBuffer<ActionAdvertisementBuffer> actionsAdvertised = AddBuffer<ActionAdvertisementBuffer>(entity);
+			DynamicBuffer<TraitBuffer> traits = AddBuffer<TraitBuffer>(entity);
+
+			// Add Social Actions
+			DynamicBuffer<ActionAdvertisementBuffer> actionsAdvertised = AddBuffer<ActionAdvertisementBuffer>(entity);
             DynamicBuffer<NeedAdvertisementBuffer> needsAdvertised = AddBuffer<NeedAdvertisementBuffer>(entity);
             int i = 0;
             foreach (var actionAdvertised in authoring.ActionsAdvertised)
