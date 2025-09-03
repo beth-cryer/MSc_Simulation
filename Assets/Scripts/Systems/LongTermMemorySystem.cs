@@ -12,7 +12,8 @@ public partial struct LongTermMemorySystem : ISystem
         EntityCommandBuffer ecb = new(Allocator.TempJob);
 
         // Find NPCs with new Long Term Memory formation due
-        foreach (var (npc, memory) in SystemAPI.Query<RefRO<NPC>, RefRW<ShortTermMemory>>())
+        foreach (var memory in SystemAPI.Query<RefRW<ShortTermMemory>>()
+		.WithAll<NPC>())
         {
             memory.ValueRW.TimeSinceLastInterval += SystemAPI.Time.DeltaTime;
             if (memory.ValueRO.TimeSinceLastInterval < memory.ValueRO.TimeInterval)
@@ -26,9 +27,10 @@ public partial struct LongTermMemorySystem : ISystem
         }
 
         // Process NPCs
-        foreach (var (npc, memory, shortMemoryBuffer, longMemoryBuffer, longMemoryPeriodBuffer, npcEntity)
-            in SystemAPI.Query<RefRO<NPC>, RefRW<ShortTermMemory>, DynamicBuffer<ShortTermMemoryBuffer>,
+        foreach (var (memory, shortMemoryBuffer, longMemoryBuffer, longMemoryPeriodBuffer, npcEntity)
+            in SystemAPI.Query<RefRW<ShortTermMemory>, DynamicBuffer<ShortTermMemoryBuffer>,
             DynamicBuffer<LongTermMemoryBuffer>, DynamicBuffer <LongTermMemoryPeriod>>()
+			.WithPresent<NPC>()
             .WithEntityAccess())
         {
             if (!memory.ValueRO.QueueLongTermMemory)

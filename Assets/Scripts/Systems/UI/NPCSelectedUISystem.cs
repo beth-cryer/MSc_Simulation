@@ -6,8 +6,9 @@ public partial struct NPCSelectedUISystem : ISystem
 {
     public void OnUpdate(ref SystemState state)
     {
-        foreach (var (npc, needs, traits, selected, entity)
-            in SystemAPI.Query<RefRO<NPC>, DynamicBuffer<NeedBuffer>, DynamicBuffer<TraitBuffer>, RefRO<SelectedEntityTag>>()
+        foreach (var (npc, needs, traits, entity)
+            in SystemAPI.Query<RefRO<NPC>, DynamicBuffer<NeedBuffer>, DynamicBuffer<TraitBuffer>>()
+			.WithAll<SelectedEntityTag>()
             .WithEntityAccess())
         {
             List<Need> needsList = new();
@@ -20,6 +21,18 @@ public partial struct NPCSelectedUISystem : ISystem
 
 			string goal  = "None";
             string interactableName = "?";
+
+			List<ENeed> changingNeeds = new() { };
+			if (SystemAPI.HasBuffer<InteractionBuffer>(entity)
+			&& !SystemAPI.HasComponent<ActionPathfind>(entity))
+			{
+				var interactionBuffer = SystemAPI.GetBuffer<InteractionBuffer>(entity);
+				foreach(var interaction in interactionBuffer)
+				{
+					changingNeeds.Add(interaction.Details.Need.Type);
+				}
+
+			}
 
             // Find object we are interacting with
             if (SystemAPI.HasComponent<QueuedAction>(entity))
@@ -60,7 +73,7 @@ public partial struct NPCSelectedUISystem : ISystem
             }
 
             string npcName = "NPC #" + entity.Index.ToString();
-            SelectedEntityUI.Instance.UpdateUI(npc.ValueRO, needsList, traitsList, npcName, goal);
+            SelectedEntityUI.Instance.UpdateUI(npc.ValueRO, needsList, changingNeeds, traitsList, npcName, goal);
 
         }
 

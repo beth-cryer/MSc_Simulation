@@ -29,8 +29,9 @@ public partial struct ActionPlannerSystem : ISystem
 		EntityCommandBuffer ecb = new(Allocator.TempJob);
 
 		// Iterate over every NPC and process their action planning
-		foreach (var (npc, npcTransform, needs, traits, npcEntity)
-			in SystemAPI.Query<RefRO<NPC>, RefRO<LocalTransform>, DynamicBuffer<NeedBuffer>, DynamicBuffer<TraitBuffer>>()
+		foreach (var (npcTransform, needs, traits, npcEntity)
+			in SystemAPI.Query<RefRO<LocalTransform>, DynamicBuffer<NeedBuffer>, DynamicBuffer<TraitBuffer>>()
+			.WithAll<NPC>()
 			.WithNone<ActionPathfind, Interaction, SocialRequest>()
 			.WithEntityAccess())
 		{

@@ -23,7 +23,7 @@ public class SelectedEntityUI : MonoBehaviour
 		m_traitData = Resources.LoadAll<TraitData>("Data/Traits/");
 	}
 
-    public void UpdateUI(NPC npc, List<Need> needs, List<Trait> traits, string name, string goal)
+    public void UpdateUI(NPC npc, List<Need> needs, List<ENeed> changingNeeds, List<Trait> traits, string name, string goal)
     {
         string text = string.Format("{0}\n\nGOAL:\n{1}", name, goal);
 		string textTraits = "";
@@ -66,7 +66,8 @@ public class SelectedEntityUI : MonoBehaviour
 
                 NeedUI need = needTransform.GetComponent<NeedUI>();
                 if (need == null) break;
-                need.SetNeed(needData.Name, needs[needIndex].Value[0], needData.MinValue[0], needData.MaxValue[0]);
+				Color needFillColor = changingNeeds.Exists(x => x == needData.Type) ? Color.white : Color.green;
+				need.SetNeed(needData.Name, needs[needIndex].Value[0], needData.MinValue[0], needData.MaxValue[0], needFillColor);
 
                 needIndex++;
                 needPopulated = true;

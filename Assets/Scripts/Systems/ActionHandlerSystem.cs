@@ -20,8 +20,9 @@ public partial struct ActionHandlerSystem : ISystem
         BlobAssetReference<ObjectsBlobAsset> blobAsset = SystemAPI.GetSingleton<BlobSingleton>().BlobAssetReference;
         EntityCommandBuffer ecb = new(Allocator.TempJob);
 
-        foreach (var (npc, needs, actions, interaction, entity) in
-            SystemAPI.Query<RefRO<NPC>, DynamicBuffer<NeedBuffer>, DynamicBuffer<InteractionBuffer>, RefRW<Interaction>>()
+        foreach (var (needs, actions, interaction, entity) in
+            SystemAPI.Query<DynamicBuffer<NeedBuffer>, DynamicBuffer<InteractionBuffer>, RefRW<Interaction>>()
+			.WithAll<NPC>()
             .WithNone<ActionPathfind>()
 			.WithEntityAccess())
         {

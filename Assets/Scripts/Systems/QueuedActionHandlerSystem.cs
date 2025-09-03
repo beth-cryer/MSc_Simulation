@@ -16,8 +16,9 @@ public partial struct QueuedActionHandlerSystem : ISystem
         EntityCommandBuffer ecb = new(Allocator.TempJob);
 
         // Pathfinding
-        foreach (var (npc, npcTransform, pathfinding, action, entity)
-            in SystemAPI.Query<RefRO<NPC>, RefRW<LocalTransform>, RefRW<ActionPathfind>, RefRO<QueuedAction>>()
+        foreach (var (npcTransform, pathfinding, action, entity)
+            in SystemAPI.Query<RefRW<LocalTransform>, RefRW<ActionPathfind>, RefRO<QueuedAction>>()
+			.WithAll<NPC>()
             .WithEntityAccess())
         {
             if (!pathfinding.ValueRO.DestinationReached)
