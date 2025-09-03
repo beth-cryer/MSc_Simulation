@@ -16,16 +16,16 @@ MonoBehaviour:
   Type: 4
   MinValue:
     x: -100
-    y: 0
-    z: 0
+    y: -100
+    z: -100
   ZeroValue:
     x: 0
     y: 0
     z: 0
   MaxValue:
     x: 100
-    y: 0
-    z: 0
+    y: 100
+    z: 100
   DecayRate:
     x: 0
     y: 0

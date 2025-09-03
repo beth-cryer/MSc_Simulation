@@ -8,6 +8,7 @@ using Unity.Transforms;
 // Remove SocialRequest tag from NPCs,
 // Add InUseTag to interaction object, if required
 [BurstCompile]
+[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public partial struct QueuedActionHandlerSystem : ISystem
 {
     [BurstCompile]
@@ -19,7 +20,8 @@ public partial struct QueuedActionHandlerSystem : ISystem
         foreach (var (npcTransform, pathfinding, action, entity)
             in SystemAPI.Query<RefRW<LocalTransform>, RefRW<ActionPathfind>, RefRO<QueuedAction>>()
 			.WithAll<NPC>()
-            .WithEntityAccess())
+			.WithNone<SocialRequest>()
+			.WithEntityAccess())
         {
             if (!pathfinding.ValueRO.DestinationReached)
                 continue;
@@ -37,13 +39,8 @@ public partial struct QueuedActionHandlerSystem : ISystem
                 // Add InUse tag to the InteractableObject
                 // Action Planner will ignore it until it is no longer in use
 
-                // Remove any SocialRequest tag from the InteractableObject (if it is also an NPC)
-
                 InUseTag inUse = new() { InteractingNPC = entity };
                 ecb.AddComponent(action.ValueRO.InteractionObject, inUse);
-
-                if (SystemAPI.HasComponent<SocialRequest>(destinationEntity))
-                    ecb.RemoveComponent<SocialRequest>(destinationEntity);
 
                 Interaction npcIsInteracting = new() { InteractionObject = action.ValueRO.InteractionObject };
                 ecb.AddComponent(entity, npcIsInteracting);

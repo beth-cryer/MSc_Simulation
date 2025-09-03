@@ -390,7 +390,7 @@ MonoBehaviour:
   - {fileID: 5828403917900642454, guid: 79f769910f87223449ad56ff2870f99b, type: 3}
   - {fileID: 3888561972207939905, guid: 23d2c584fbec0204b879471bdef1e795, type: 3}
   - {fileID: 2969081991376895632, guid: 434fbd9921efeed4a97480c17eb5ffce, type: 3}
-  SpawnAmount: 50
+  SpawnAmount: 10
 --- !u!1 &2035598958
 GameObject:
   m_ObjectHideFlags: 0
@@ -529,6 +529,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 263292000886606477, guid: d9b2bb9a009990948a7d9fb53c70f12f, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2530789614143884618, guid: d9b2bb9a009990948a7d9fb53c70f12f, type: 3}
       propertyPath: m_Name
       value: SelectionCircle

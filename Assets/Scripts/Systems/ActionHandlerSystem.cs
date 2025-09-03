@@ -144,8 +144,15 @@ public partial struct ActionHandlerSystem : ISystem
             if (!isActionFinished)
                 continue;
 
-            // Create short term Memory
-            //
+			// Create short term Memory
+			//
+
+			// Remove any SocialRequest tag from the InteractableObject (if it is also an NPC)
+			if (SystemAPI.HasComponent<NPC>(interaction.ValueRO.InteractionObject))
+			{
+				if (SystemAPI.HasComponent<SocialRequest>(interaction.ValueRO.InteractionObject))
+					ecb.RemoveComponent<SocialRequest>(interaction.ValueRO.InteractionObject);
+			}
 
             // Remove all components related to the action from both Entities involved
             //interaction.ValueRW.TimeElapsed = 0.0f;

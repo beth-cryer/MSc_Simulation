@@ -27,7 +27,7 @@ MonoBehaviour:
     y: 0
     z: 0
   DecayRate:
-    x: 2
+    x: 1
     y: 0
     z: 0
   IsVisibleNeed: 1

@@ -31,7 +31,6 @@ public partial struct NPCSelectedUISystem : ISystem
 				{
 					changingNeeds.Add(interaction.Details.Need.Type);
 				}
-
 			}
 
             // Find object we are interacting with
@@ -48,8 +47,12 @@ public partial struct NPCSelectedUISystem : ISystem
                 if (SystemAPI.HasComponent<ActionPathfind>(entity))
                 {
                     var pathfind = SystemAPI.GetComponent<ActionPathfind>(entity);
-                    if (pathfind.DestinationReached)
-                        goal = string.Format("Waiting for {0} to be free", interactableName);
+					var socialRequest = SystemAPI.HasComponent<SocialRequest>(entity);
+					if (pathfind.DestinationReached)
+					{
+						if (!socialRequest)
+							goal = string.Format("Waiting for {0} to be free", interactableName);
+					} 
                     else
                         goal = string.Format("Moving to {0}", interactableName);
                 }

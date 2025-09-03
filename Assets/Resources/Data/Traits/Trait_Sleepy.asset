@@ -17,6 +17,6 @@ MonoBehaviour:
   NeedModifiers:
   - Need: 2
     Modifier:
-      x: -50
+      x: -30
       y: 0
       z: 0

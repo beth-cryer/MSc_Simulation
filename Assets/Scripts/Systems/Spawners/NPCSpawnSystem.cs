@@ -3,10 +3,9 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
 [UpdateInGroup(typeof(SimulationSystemGroup))]
-public partial struct SpawnSystem : ISystem
+public partial struct NPCSpawnSystem : ISystem
 {
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -31,6 +30,7 @@ public partial struct SpawnSystem : ISystem
 		var prefabBuffer = SystemAPI.GetBuffer<NPCPrefab>(spawnerEntity);
 
 		NativeArray<Entity> npcInstances = new NativeArray<Entity>(npcSpawner.SpawnAmount, Allocator.Temp);
+		int normalGuys = 0;
 		for(int i = 0; i < npcSpawner.SpawnAmount; i ++)
 		{
 			int randomSprite = randomSingleton.ValueRW.Random.NextInt(prefabBuffer.Length - 1);
@@ -43,10 +43,15 @@ public partial struct SpawnSystem : ISystem
 			var randomTraitData = blobAsset.Value.TraitsData[randomTrait].Trait;
 
 			var traitBuffer = ecb.SetBuffer<TraitBuffer>(entity);
-			traitBuffer.Add(new()
+			if (normalGuys > (int)(npcSpawner.SpawnAmount * 0.25)) // make 25% of NPCs just normal guys, so we have a baseline
 			{
-				Trait = randomTraitData
-			});
+				traitBuffer.Add(new()
+				{
+					Trait = randomTraitData
+				});
+			}
+
+			normalGuys++;
 		}
 
 		npcInstances.Dispose();
