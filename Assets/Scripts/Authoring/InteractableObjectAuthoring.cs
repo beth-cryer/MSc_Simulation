@@ -32,6 +32,8 @@ public class InteractableObjectAuthoring : MonoBehaviour
                 {
                     NeedAdvertisedCount = actionAdvertised.NeedAdvertised.Length,
                     NeedAdvertisedIndex = i,
+					EmotionAdvertised = actionAdvertised.Emotion,
+					Reaction = actionAdvertised.Reaction,
                 });
 
                 // Add all of the needs advertised by the object to its Entity

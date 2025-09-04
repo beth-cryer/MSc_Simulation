@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.Mathematics;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public class SelectedEntityUI : MonoBehaviour
 {
+	[SerializeField] private CanvasGroup m_entityLayoutGroup;
     [SerializeField] private GameObject m_prefab_needBar;
     [SerializeField] private TMP_Text m_text;
 	[SerializeField] private TMP_Text m_textTraits;
@@ -23,9 +23,16 @@ public class SelectedEntityUI : MonoBehaviour
 		m_traitData = Resources.LoadAll<TraitData>("Data/Traits/");
 	}
 
+	public void HideUI()
+	{
+		m_entityLayoutGroup.alpha = 0.0f;
+	}
+
     public void UpdateUI(NPC npc, List<Need> needs, List<ENeed> changingNeeds, List<Trait> traits, string name, string goal)
     {
-        string text = string.Format("{0}\n\nGOAL:\n{1}", name, goal);
+		m_entityLayoutGroup.alpha = 1.0f;
+
+		string text = string.Format("{0}\n\nGOAL:\n{1}", name, goal);
 		string textTraits = "";
 		foreach (var trait in traits)
 		{

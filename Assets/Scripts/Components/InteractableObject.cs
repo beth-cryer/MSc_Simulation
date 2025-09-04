@@ -6,8 +6,3 @@ public struct InteractableObject: IComponentData
     public FixedString32Bytes Name;
 	public float InteractDistance;
 }
-
-public struct ObjectActionBuffer : IBufferElementData
-{
-    public Entity ActionEntity;
-}

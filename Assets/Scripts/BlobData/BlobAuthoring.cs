@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
@@ -73,6 +70,19 @@ public class BlobAuthoring: MonoBehaviour
 						},
 						Type = TraitData[i].Type,
 					}
+				};
+			}
+
+			// Load Emotions Data
+			EmotionData[] EmotionData = Resources.LoadAll<EmotionData>("Data/Emotions/");
+			BlobBuilderArray<EmotionsData> emotionsArray = blobBuilder.Allocate(ref blobAsset.EmotionsData, EmotionData.Length);
+			for (int i = 0; i < EmotionData.Length; i++)
+			{
+				int index = (int)EmotionData[i].Type;
+				emotionsArray[index] = new()
+				{
+					Type = EmotionData[i].Type,
+					PADValue = EmotionData[i].PADValue,
 				};
 			}
 

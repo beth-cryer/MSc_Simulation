@@ -41,6 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: NPC UI
+    uniqueID: 3508538535
+    locked: 0
   - name: Marker
     uniqueID: 1562024297
     locked: 0

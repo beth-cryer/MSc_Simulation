@@ -27,7 +27,7 @@ MonoBehaviour:
         x: 5
         y: 0
         z: 0
-      InteractDuration: 4
+      InteractDuration: 6
       MinInteractDuration: 2
       RequiredToCompleteAction: 1
     - NeedAdvertised:
@@ -44,4 +44,5 @@ MonoBehaviour:
       InteractDuration: 0
       MinInteractDuration: 0
       RequiredToCompleteAction: 0
+    Emotion: 0
   InteractDistance: 0.7

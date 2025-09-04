@@ -22,7 +22,7 @@ public partial struct ActionHandlerSystem : ISystem
 
         foreach (var (needs, actions, interaction, entity) in
             SystemAPI.Query<DynamicBuffer<NeedBuffer>, DynamicBuffer<InteractionBuffer>, RefRW<Interaction>>()
-			.WithAll<NPC>()
+			.WithAll<NPC, ShortTermMemoryBuffer>()
             .WithNone<ActionPathfind>()
 			.WithEntityAccess())
         {
@@ -145,7 +145,16 @@ public partial struct ActionHandlerSystem : ISystem
                 continue;
 
 			// Create short term Memory
-			//
+			EEmotion resultEmotion = interaction.ValueRO.Emotion;
+			ShortTermMemoryBuffer newMemory = new()
+			{
+				Memory = new()
+				{
+					// Get float3 value of resulting emotion from blobAsset
+					EmotionResponse = blobAsset.Value.EmotionsData[(int)resultEmotion].PADValue,
+				}
+			};
+			ecb.AppendToBuffer(entity, newMemory);
 
 			// Remove any SocialRequest tag from the InteractableObject (if it is also an NPC)
 			if (SystemAPI.HasComponent<NPC>(interaction.ValueRO.InteractionObject))

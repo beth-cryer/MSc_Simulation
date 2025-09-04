@@ -35,7 +35,17 @@ public class NPCAgentAuthoring: MonoBehaviour
 
             AddComponent(entity, npc);
 
-			DynamicBuffer<TraitBuffer> traits = AddBuffer<TraitBuffer>(entity);
+			// Add empty dynamic buffers
+			AddBuffer<TraitBuffer>(entity);
+			AddBuffer<ShortTermMemoryBuffer>(entity);
+			AddBuffer<LongTermMemoryBuffer>(entity);
+
+			ShortTermMemory shortTermMemory = new()
+			{
+				TimeInterval = 30.0f,
+				MemoryLimit = 10,
+			};
+			AddComponent<ShortTermMemory>(entity, shortTermMemory);
 
 			// Add Social Actions
 			DynamicBuffer<ActionAdvertisementBuffer> actionsAdvertised = AddBuffer<ActionAdvertisementBuffer>(entity);
@@ -47,6 +57,8 @@ public class NPCAgentAuthoring: MonoBehaviour
                 {
                     NeedAdvertisedCount = actionAdvertised.NeedAdvertised.Length,
                     NeedAdvertisedIndex = i,
+					EmotionAdvertised = actionAdvertised.Emotion,
+					Reaction = actionAdvertised.Reaction,
                 });
 
                 // Add all of the needs advertised by the object to its Entity

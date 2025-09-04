@@ -51,7 +51,7 @@ PrefabInstance:
     - target: {fileID: 5925093379083325927, guid: d401c4d688ec27d4c99cd8bed62ed769, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 1834942436, guid: daea3b539dc0f3945af4255443422183, type: 3}
+      objectReference: {fileID: -795305923, guid: daea3b539dc0f3945af4255443422183, type: 3}
     - target: {fileID: 9098243305692466381, guid: d401c4d688ec27d4c99cd8bed62ed769, type: 3}
       propertyPath: m_Name
       value: NPC_5

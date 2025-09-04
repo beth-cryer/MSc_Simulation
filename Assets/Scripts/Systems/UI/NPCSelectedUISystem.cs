@@ -6,6 +6,8 @@ public partial struct NPCSelectedUISystem : ISystem
 {
     public void OnUpdate(ref SystemState state)
     {
+		bool isSelected = false;
+
         foreach (var (npc, needs, traits, entity)
             in SystemAPI.Query<RefRO<NPC>, DynamicBuffer<NeedBuffer>, DynamicBuffer<TraitBuffer>>()
 			.WithAll<SelectedEntityTag>()
@@ -78,7 +80,12 @@ public partial struct NPCSelectedUISystem : ISystem
             string npcName = "NPC #" + entity.Index.ToString();
             SelectedEntityUI.Instance.UpdateUI(npc.ValueRO, needsList, changingNeeds, traitsList, npcName, goal);
 
+			isSelected = true;
         }
 
-    }
+		if (!isSelected)
+			SelectedEntityUI.Instance.HideUI();
+
+
+	}
 }

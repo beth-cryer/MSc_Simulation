@@ -10,8 +10,8 @@ public partial struct NPCSpawnSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-		state.RequireForUpdate<BlobSingleton>();
 		state.RequireForUpdate<Spawner>();
+		state.RequireForUpdate<BlobSingleton>();
 		state.RequireForUpdate<RandomSingleton>();
     }
 
@@ -43,7 +43,7 @@ public partial struct NPCSpawnSystem : ISystem
 			var randomTraitData = blobAsset.Value.TraitsData[randomTrait].Trait;
 
 			var traitBuffer = ecb.SetBuffer<TraitBuffer>(entity);
-			if (normalGuys > (int)(npcSpawner.SpawnAmount * 0.25)) // make 25% of NPCs just normal guys, so we have a baseline
+			if (normalGuys > (int)(npcSpawner.SpawnAmount * 0.5)) // make 50% of NPCs just normal guys, so we have a baseline
 			{
 				traitBuffer.Add(new()
 				{

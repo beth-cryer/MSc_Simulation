@@ -97,7 +97,11 @@ public partial struct PathfindHandlerSystem : ISystem
                     InUseTag inUse = new() { InteractingNPC = entity };
                     ecb.AddComponent(action.ValueRO.InteractionObject, inUse);
 
-                    Interaction npcIsInteracting = new() { InteractionObject = action.ValueRO.InteractionObject };
+                    Interaction npcIsInteracting = new()
+					{
+						InteractionObject = action.ValueRO.InteractionObject,
+						Emotion = action.ValueRO.Emotion,
+					};
                     ecb.AddComponent(entity, npcIsInteracting);
 
                     // (AddComponent won't replace an existing component, so if there does end up being an InUseTag already it's fine_

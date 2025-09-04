@@ -170,7 +170,9 @@ public partial struct ActionPlannerSystem : ISystem
 					{
 						InteractableObjectEntity = objEntity,
 						InteractableObject = obj.ValueRO,
-						Buffer = needsAdvertised,
+						Buffer = needsAdvertised, // this has to change to JUST the needsAdvertised by the action
+						EmotionAdvertised = actionAdvertised.EmotionAdvertised,
+						Reaction = actionAdvertised.Reaction,
 						Position = objTransform.ValueRO.Position,
 						InteractDistance = obj.ValueRO.InteractDistance,
 						Weight = weightedValue
@@ -201,6 +203,8 @@ public partial struct ActionPlannerSystem : ISystem
 
 			QueuedAction action = new() {
 				InteractionObject = weights[randomIndex].InteractableObjectEntity,
+				Emotion = weights[randomIndex].EmotionAdvertised,
+				Reaction = weights[randomIndex].Reaction,
 			};
 			ecb.AddComponent(npcEntity, action);
 
@@ -243,5 +247,7 @@ struct WeightedAction
 	public float3 Position;
 	public float InteractDistance;
 	public float Weight;
+	public EEmotion EmotionAdvertised;
+	public EEmotionIndicator Reaction;
 	public Entity InteractableObjectEntity;
 }
