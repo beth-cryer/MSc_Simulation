@@ -175,7 +175,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5050934532174095572, guid: 30ea09380a07ae94a8454902e9ff94d4, type: 3}
       propertyPath: m_Name
-      value: InteractableObject
+      value: Books
       objectReference: {fileID: 0}
     - target: {fileID: 8843745101225167831, guid: 30ea09380a07ae94a8454902e9ff94d4, type: 3}
       propertyPath: ObjectData

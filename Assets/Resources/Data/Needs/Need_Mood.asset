@@ -30,7 +30,7 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
-  IsVisibleNeed: 1
+  IsVisibleNeed: 0
   Curve:
     serializedVersion: 2
     m_Curve:

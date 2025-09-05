@@ -287,7 +287,7 @@ MonoBehaviour:
   - {fileID: 5828403917900642454, guid: 79f769910f87223449ad56ff2870f99b, type: 3}
   - {fileID: 3888561972207939905, guid: 23d2c584fbec0204b879471bdef1e795, type: 3}
   - {fileID: 2969081991376895632, guid: 434fbd9921efeed4a97480c17eb5ffce, type: 3}
-  SpawnAmount: 10
+  SpawnAmount: 2
 --- !u!1 &2035598958
 GameObject:
   m_ObjectHideFlags: 0

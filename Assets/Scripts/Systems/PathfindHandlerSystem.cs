@@ -39,7 +39,7 @@ public partial struct PathfindHandlerSystem : ISystem
             //Debug.Log("At destination");
 
             // Check if the target moved since Pathfind component was created,
-            var targetPositionCurrent = SystemAPI.GetComponent<LocalTransform>(action.ValueRO.InteractionObject);
+            var targetPositionCurrent = SystemAPI.GetComponent<LocalToWorld>(action.ValueRO.InteractionObject);
             //Debug.Log("Me " + entity.Index.ToString() + ", Them " + action.ValueRO.InteractionObject.Index.ToString());
 
             if (math.distance(targetPos, targetPositionCurrent.Position) > pathfinding.ValueRO.InteractDistance)

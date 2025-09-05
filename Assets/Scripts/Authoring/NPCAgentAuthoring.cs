@@ -4,7 +4,7 @@ using UnityEngine;
 public class NPCAgentAuthoring: MonoBehaviour
 {
     public ActionAdvertised[] ActionsAdvertised;
-    public Need[] NeedsAdvertised;
+    public Need[] NPCNeeds;
 
     class NPCAgentBaker : Baker<NPCAgentAuthoring>
     {
@@ -21,7 +21,7 @@ public class NPCAgentAuthoring: MonoBehaviour
             };
 
             DynamicBuffer<NeedBuffer> needs = AddBuffer<NeedBuffer>(entity);
-            foreach (var need in authoring.NeedsAdvertised)
+            foreach (var need in authoring.NPCNeeds)
             {
                 needs.Add(new()
                 {

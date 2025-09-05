@@ -43,8 +43,8 @@ public partial struct ActionPlannerSystem : ISystem
 			float sumOfWeights = 0;
 
 			// Loop through each Interactable, check their Advertised Needs and calculate their Utility weight
-			foreach (var (obj, objTransform, actionsAdvertised, needsAdvertised, objEntity) in
-				SystemAPI.Query<RefRO<InteractableObject>, RefRO<LocalTransform>, DynamicBuffer<ActionAdvertisementBuffer>, DynamicBuffer <NeedAdvertisementBuffer>>()
+			foreach (var (obj, objTransform, objTransformWorld, actionsAdvertised, needsAdvertised, objEntity) in
+				SystemAPI.Query<RefRO<InteractableObject>, RefRO<LocalTransform>, RefRO<LocalToWorld>, DynamicBuffer<ActionAdvertisementBuffer>, DynamicBuffer <NeedAdvertisementBuffer>>()
 				.WithNone<InUseTag, ActionPathfind>()
 				.WithEntityAccess())
 			{
@@ -152,7 +152,7 @@ public partial struct ActionPlannerSystem : ISystem
 
 					// Add distance from NPC
 					// Get scaled value of the distance on our Distance Scaling Curve
-					float3 targetPos = objTransform.ValueRO.Position;
+					float3 targetPos = objTransformWorld.ValueRO.Position;
 					float distance = math.max(math.distance(npcPos, targetPos), 1.0f); //don't allow division by 0
 					
 					ref DistanceScalingData distanceScalingData = ref blobAsset.Value.DistanceScalingData;
@@ -173,7 +173,7 @@ public partial struct ActionPlannerSystem : ISystem
 						Buffer = needsAdvertised, // this has to change to JUST the needsAdvertised by the action
 						EmotionAdvertised = actionAdvertised.EmotionAdvertised,
 						Reaction = actionAdvertised.Reaction,
-						Position = objTransform.ValueRO.Position,
+						Position = targetPos,
 						InteractDistance = obj.ValueRO.InteractDistance,
 						Weight = weightedValue
 					};

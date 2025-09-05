@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.UniversalDelegates;
@@ -7,13 +8,15 @@ using Unity.Transforms;
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 public partial struct ObjectSpawnSystem : ISystem
 {
-    public void OnCreate(ref SystemState state)
+	[BurstCompile]
+	public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<WorldSpawner>();
 		state.RequireForUpdate<BlobSingleton>();
 		state.RequireForUpdate<RandomSingleton>();
 	}
 
+	[BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         state.Enabled = false; //this means spawn will only run once on startup
