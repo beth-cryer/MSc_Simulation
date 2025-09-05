@@ -15,9 +15,12 @@ public class ObjectData: ScriptableObject
 [Serializable]
 public class ActionAdvertised
 {
+	public string Name;
     public NeedAdvertisedData[] NeedAdvertised;
-	public EEmotion Emotion;
-	public EEmotionIndicator Reaction;
+	public EEmotion InitiatorEmotion;
+	public EEmotion TargetEmotion;
+	public EEmotionIndicator InitiatorReaction;
+	public EEmotionIndicator TargetReaction;
 }
 
 [Serializable]

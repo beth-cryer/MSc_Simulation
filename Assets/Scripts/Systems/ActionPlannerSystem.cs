@@ -144,7 +144,6 @@ public partial struct ActionPlannerSystem : ISystem
 
 						weightedValue += advertisedValue * curveValue;
 
-						
 						//Debug.Log(string.Format("need = {0}, weighted value = {1}, advertisedValue = {2} currentNeedValue = {3}, curveIndex = {4}, curveValue = {5}",
 						//	needAdvertised.Need.Type.ToString(), weightedValue, advertisedValue, currentNeedValue, curveIndex, curveValue));
 						
@@ -170,9 +169,8 @@ public partial struct ActionPlannerSystem : ISystem
 					{
 						InteractableObjectEntity = objEntity,
 						InteractableObject = obj.ValueRO,
-						Buffer = needsAdvertised, // this has to change to JUST the needsAdvertised by the action
-						EmotionAdvertised = actionAdvertised.EmotionAdvertised,
-						Reaction = actionAdvertised.Reaction,
+						Action = actionAdvertised,
+						Buffer = needsAdvertised,
 						Position = targetPos,
 						InteractDistance = obj.ValueRO.InteractDistance,
 						Weight = weightedValue
@@ -192,30 +190,35 @@ public partial struct ActionPlannerSystem : ISystem
 			// Randomly pick from weighted list
 			int randomIndex = PickWeightedValue(ref randomSingleton.ValueRW, ref weights, weightCount, sumOfWeights);
 
+			WeightedAction chosenAction = weights[randomIndex];
+
 			ActionPathfind pathfind = new() {
-				DestinationEntity = weights[randomIndex].InteractableObjectEntity,
-				Destination = weights[randomIndex].Position,
-				InteractDistance = weights[randomIndex].InteractDistance,
+				DestinationEntity = chosenAction.InteractableObjectEntity,
+				Destination = chosenAction.Position,
+				InteractDistance = chosenAction.InteractDistance,
 				RedirectAttempts = 3,
 				WaitForTargetToBeFree = 5.0f,
 			};
 			ecb.AddComponent(npcEntity, pathfind);  // note: AddComponent overwrites existing component if there is one
 
 			QueuedAction action = new() {
-				InteractionObject = weights[randomIndex].InteractableObjectEntity,
-				Emotion = weights[randomIndex].EmotionAdvertised,
-				Reaction = weights[randomIndex].Reaction,
+				Name = chosenAction.Action.Name,
+				InteractionObject = chosenAction.InteractableObjectEntity,
+				InitiatorEmotion = chosenAction.Action.EmotionAdvertised,
+				InitiatorReaction = chosenAction.Action.InitiatorReaction,
+				TargetEmotion = chosenAction.Action.TargetEmotion,
+				TargetReaction = chosenAction.Action.TargetReaction,
 			};
 			ecb.AddComponent(npcEntity, action);
 
 			// Copy NeedAdvertisementBuffer onto the NPC now
 			// so that ActionHandlerSystem can execute the action without having to do another lookup later
 			DynamicBuffer<InteractionBuffer> actionBuffer = ecb.AddBuffer<InteractionBuffer>(npcEntity);
-			foreach (NeedAdvertisementBuffer needAdvertised in weights[randomIndex].Buffer)
+			for (int i = chosenAction.Action.NeedAdvertisedIndex; i < chosenAction.Action.NeedAdvertisedIndex + chosenAction.Action.NeedAdvertisedCount; i++)
 			{
 				actionBuffer.Add(new()
 				{
-					Details = needAdvertised.Details,
+					Details = chosenAction.Buffer[i].Details,
 				});
 			}
 
@@ -244,10 +247,9 @@ struct WeightedAction
 {
 	public DynamicBuffer<NeedAdvertisementBuffer> Buffer;
 	public InteractableObject InteractableObject;
+	public ActionAdvertisementBuffer Action;
 	public float3 Position;
 	public float InteractDistance;
 	public float Weight;
-	public EEmotion EmotionAdvertised;
-	public EEmotionIndicator Reaction;
 	public Entity InteractableObjectEntity;
 }

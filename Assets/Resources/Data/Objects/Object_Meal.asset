@@ -15,7 +15,8 @@ MonoBehaviour:
   Name: Food
   Sprite: {fileID: -3383071821664854342, guid: 498d6c33c89360e43b56b0934609c613, type: 3}
   ActionsAdvertised:
-  - NeedAdvertised:
+  - Name: Eating
+    NeedAdvertised:
     - NeedAdvertised:
         Type: 0
         Value:
@@ -45,4 +46,5 @@ MonoBehaviour:
       MinInteractDuration: 0
       RequiredToCompleteAction: 0
     Emotion: 0
+    Reaction: 0
   InteractDistance: 0.5

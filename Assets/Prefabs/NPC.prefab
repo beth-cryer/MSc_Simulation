@@ -103,7 +103,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ActionsAdvertised:
-  - NeedAdvertised:
+  - Name: Chatting with
+    NeedAdvertised:
     - NeedAdvertised:
         Type: 3
         Value:
@@ -118,8 +119,90 @@ MonoBehaviour:
       InteractDuration: 5
       MinInteractDuration: 5
       RequiredToCompleteAction: 1
-    Emotion: 0
-    Reaction: 0
+    InitiatorEmotion: 10
+    TargetEmotion: 10
+    InitiatorReaction: 0
+    TargetReaction: 0
+  - Name: Hugging
+    NeedAdvertised:
+    - NeedAdvertised:
+        Type: 3
+        Value:
+          x: 0
+          y: 0
+          z: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 15
+        y: 0
+        z: 0
+      InteractDuration: 5
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 1
+    InitiatorEmotion: 1
+    TargetEmotion: 1
+    InitiatorReaction: 0
+    TargetReaction: 0
+  - Name: Rejecting
+    NeedAdvertised:
+    - NeedAdvertised:
+        Type: 3
+        Value:
+          x: 0
+          y: 0
+          z: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 10
+        y: 0
+        z: 0
+      InteractDuration: 5
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 1
+    InitiatorEmotion: 10
+    TargetEmotion: 4
+    InitiatorReaction: 0
+    TargetReaction: 0
+  - Name: Insulting
+    NeedAdvertised:
+    - NeedAdvertised:
+        Type: 3
+        Value:
+          x: 0
+          y: 0
+          z: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 10
+        y: 0
+        z: 0
+      InteractDuration: 5
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 1
+    InitiatorEmotion: 5
+    TargetEmotion: 9
+    InitiatorReaction: 0
+    TargetReaction: 0
+  - Name: Threatening
+    NeedAdvertised:
+    - NeedAdvertised:
+        Type: 3
+        Value:
+          x: 0
+          y: 0
+          z: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 5
+        y: 0
+        z: 0
+      InteractDuration: 5
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 1
+    InitiatorEmotion: 6
+    TargetEmotion: 8
+    InitiatorReaction: 0
+    TargetReaction: 0
   NPCNeeds:
   - Type: 0
     Value:

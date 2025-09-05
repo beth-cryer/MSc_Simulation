@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2eeebd0ed8580ba4585641ca9b7c0a89, type: 3}
   m_Name: Object_Bookcase
   m_EditorClassIdentifier: 
-  Name: Read Book
+  Name: Book
   Sprite: {fileID: -3784609330376001291, guid: 498d6c33c89360e43b56b0934609c613, type: 3}
   ActionsAdvertised:
-  - NeedAdvertised:
+  - Name: Reading a
+    NeedAdvertised:
     - NeedAdvertised:
         Type: 5
         Value:
@@ -44,5 +45,8 @@ MonoBehaviour:
       InteractDuration: 0
       MinInteractDuration: 0
       RequiredToCompleteAction: 0
-    Emotion: 0
+    InitiatorEmotion: 1
+    TargetEmotion: 0
+    InitiatorReaction: 0
+    TargetReaction: 0
   InteractDistance: 0.7

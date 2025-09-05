@@ -21,4 +21,6 @@ public enum ETrait
 	Glutton,
 	Outdoorsy,
 	Shutin,
+	Annoying,
+	Dancer,
 }

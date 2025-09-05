@@ -144,21 +144,40 @@ public partial struct ActionHandlerSystem : ISystem
             if (!isActionFinished)
                 continue;
 
-			// Create short term Memory
-			EEmotion resultEmotion = interaction.ValueRO.Emotion;
-			ShortTermMemoryBuffer newMemory = new()
+			// Add short term Memory
+			EEmotion initiatorEmotion = interaction.ValueRO.InitiatorEmotion;
+			if (initiatorEmotion != EEmotion.None)
 			{
-				Memory = new()
+				ShortTermMemoryBuffer newMemoryInitiator = new()
 				{
-					// Get float3 value of resulting emotion from blobAsset
-					EmotionResponse = blobAsset.Value.EmotionsData[(int)resultEmotion].PADValue,
-				}
-			};
-			ecb.AppendToBuffer(entity, newMemory);
+					// Get float3 value of emotion from blobAsset
+					Memory = new()
+					{
+						Type = initiatorEmotion,
+						EmotionResponse = blobAsset.Value.EmotionsData[(int)initiatorEmotion].PADValue
+					}
+				};
+				ecb.AppendToBuffer(entity, newMemoryInitiator);
+			}
 
-			// Remove any SocialRequest tag from the InteractableObject (if it is also an NPC)
+			// If InteractableObject is also an NPC:
+			//	Add a short term memory to the target NPC
+			//	Remove any existing SocialRequest tag
 			if (SystemAPI.HasComponent<NPC>(interaction.ValueRO.InteractionObject))
 			{
+				EEmotion targetEmotion = interaction.ValueRO.TargetEmotion;
+				if (targetEmotion != EEmotion.None)
+				{
+					ShortTermMemoryBuffer newMemoryTarget = new()
+					{
+						Memory = new()
+						{
+							Type = targetEmotion,
+							EmotionResponse = blobAsset.Value.EmotionsData[(int)targetEmotion].PADValue,
+						}
+					};
+					ecb.AppendToBuffer(interaction.ValueRO.InteractionObject, newMemoryTarget);
+				}
 				if (SystemAPI.HasComponent<SocialRequest>(interaction.ValueRO.InteractionObject))
 					ecb.RemoveComponent<SocialRequest>(interaction.ValueRO.InteractionObject);
 			}

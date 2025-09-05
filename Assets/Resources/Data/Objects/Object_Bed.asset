@@ -15,7 +15,8 @@ MonoBehaviour:
   Name: Bed
   Sprite: {fileID: 3968284269802435371, guid: 498d6c33c89360e43b56b0934609c613, type: 3}
   ActionsAdvertised:
-  - NeedAdvertised:
+  - Name: Sleeping in
+    NeedAdvertised:
     - NeedAdvertised:
         Type: 2
         Value:
@@ -44,3 +45,6 @@ MonoBehaviour:
       InteractDuration: 0
       MinInteractDuration: 0
       RequiredToCompleteAction: 0
+    Emotion: 0
+    Reaction: 0
+  InteractDistance: 0.01

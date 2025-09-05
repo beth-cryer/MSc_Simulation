@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2eeebd0ed8580ba4585641ca9b7c0a89, type: 3}
   m_Name: Object_Shelter
   m_EditorClassIdentifier: 
-  Name: Warm Up
+  Name: House
   Sprite: {fileID: 21300000, guid: 60054fb54aa500a47b504824656ba720, type: 3}
   ActionsAdvertised:
-  - NeedAdvertised:
+  - Name: Warming up in
+    NeedAdvertised:
     - NeedAdvertised:
         Type: 1
         Value:
@@ -30,3 +31,6 @@ MonoBehaviour:
       InteractDuration: 4
       MinInteractDuration: 4
       RequiredToCompleteAction: 1
+    Emotion: 0
+    Reaction: 0
+  InteractDistance: 0.01

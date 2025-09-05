@@ -30,10 +30,13 @@ public class InteractableObjectAuthoring : MonoBehaviour
             {
                 actionsAdvertised.Add(new()
                 {
+					Name = actionAdvertised.Name,
                     NeedAdvertisedCount = actionAdvertised.NeedAdvertised.Length,
                     NeedAdvertisedIndex = i,
-					EmotionAdvertised = actionAdvertised.Emotion,
-					Reaction = actionAdvertised.Reaction,
+					EmotionAdvertised = actionAdvertised.InitiatorEmotion,
+					TargetEmotion = actionAdvertised.TargetEmotion,
+					InitiatorReaction = actionAdvertised.InitiatorReaction,
+					TargetReaction = actionAdvertised.TargetReaction,
                 });
 
                 // Add all of the needs advertised by the object to its Entity

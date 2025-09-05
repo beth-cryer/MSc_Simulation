@@ -36,7 +36,8 @@ public struct Action
 	public Need Need;
 	public EActionType ActionType;
 	public float3 NeedValueChange; // amount to move Need value by (per second). ignored if 0
-	public EEmotion Emotion;
+	public EEmotion InitiatorEmotion;
+	public EEmotion TargetEmotion;
 	public float InteractDuration;
 	public float MinInteractDuration;
 	public bool RequiredToCompleteAction;

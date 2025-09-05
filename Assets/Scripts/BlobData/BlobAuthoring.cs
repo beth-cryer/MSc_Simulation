@@ -75,7 +75,7 @@ public class BlobAuthoring: MonoBehaviour
 
 			// Load Emotions Data
 			EmotionData[] EmotionData = Resources.LoadAll<EmotionData>("Data/Emotions/");
-			BlobBuilderArray<EmotionsData> emotionsArray = blobBuilder.Allocate(ref blobAsset.EmotionsData, EmotionData.Length);
+			BlobBuilderArray<EmotionsData> emotionsArray = blobBuilder.Allocate(ref blobAsset.EmotionsData, (int)EEmotion.COUNT);
 			for (int i = 0; i < EmotionData.Length; i++)
 			{
 				int index = (int)EmotionData[i].Type;

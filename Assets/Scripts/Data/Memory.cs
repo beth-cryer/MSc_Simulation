@@ -15,7 +15,7 @@ public struct LongTermMemoryBuffer : IBufferElementData
 
 public struct Memory
 {
-    public int Type;
+    public EEmotion Type;
     public float3 EmotionResponse;
 }
 

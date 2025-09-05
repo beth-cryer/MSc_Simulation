@@ -44,8 +44,12 @@ public partial struct QueuedActionHandlerSystem : ISystem
 
 				Interaction npcIsInteracting = new()
 				{
+					Name = action.ValueRO.Name,
 					InteractionObject = action.ValueRO.InteractionObject,
-					Emotion = action.ValueRO.Emotion,
+					InitiatorEmotion = action.ValueRO.InitiatorEmotion,
+					TargetEmotion = action.ValueRO.TargetEmotion,
+					InitiatorReaction = action.ValueRO.InitiatorReaction,
+					TargetReaction = action.ValueRO.TargetReaction,
 				};
 				ecb.AddComponent(entity, npcIsInteracting);
             }

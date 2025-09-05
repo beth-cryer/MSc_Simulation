@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Unity.Entities;
+using UnityEngine;
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public partial struct NPCSelectedUISystem : ISystem
@@ -23,61 +24,67 @@ public partial struct NPCSelectedUISystem : ISystem
 
 			string goal  = "None";
             string interactableName = "?";
-
 			List<ENeed> changingNeeds = new() { };
-			if (SystemAPI.HasBuffer<InteractionBuffer>(entity)
-			&& !SystemAPI.HasComponent<ActionPathfind>(entity))
+
+			// Find object we are interacting with
+			if (SystemAPI.HasComponent<Interaction>(entity))
 			{
-				var interactionBuffer = SystemAPI.GetBuffer<InteractionBuffer>(entity);
-				foreach(var interaction in interactionBuffer)
+				Interaction action = SystemAPI.GetComponent<Interaction>(entity);
+				string actionName = action.Name.ToString();
+
+				if (!SystemAPI.HasComponent<NPC>(action.InteractionObject))
+					interactableName = SystemAPI.GetComponent<InteractableObject>(action.InteractionObject).Name.ToString();
+				else
+					interactableName = "NPC #" + action.InteractionObject.Index;
+
+				//Done pathfinding, thus we are doing the action-
+				if (!SystemAPI.HasComponent<ActionPathfind>(entity))
 				{
-					changingNeeds.Add(interaction.Details.Need.Type);
+					goal = string.Format("{0} {1}", actionName, interactableName); //Print the action and interactable name
+
+					// Highligh
+					if (SystemAPI.HasBuffer<InteractionBuffer>(entity))
+					{
+						var interactionBuffer = SystemAPI.GetBuffer<InteractionBuffer>(entity);
+						foreach (var interaction in interactionBuffer)
+						{
+							changingNeeds.Add(interaction.Details.Need.Type);
+						}
+					}
 				}
-			}
 
-            // Find object we are interacting with
-            if (SystemAPI.HasComponent<QueuedAction>(entity))
-            {
-                var action = SystemAPI.GetComponent<QueuedAction>(entity);
+			}else
+			if (SystemAPI.HasComponent<QueuedAction>(entity))
+			{
+				var action = SystemAPI.GetComponent<QueuedAction>(entity);
+				bool isPathfinding = SystemAPI.HasComponent<ActionPathfind>(entity);
 
-                if (!SystemAPI.HasComponent<NPC>(action.InteractionObject))
-                    interactableName = SystemAPI.GetComponent<InteractableObject>(action.InteractionObject).Name.ToString();
-                else
-                    interactableName = "NPC #" + action.InteractionObject.Index;
+				if (!SystemAPI.HasComponent<NPC>(action.InteractionObject))
+					interactableName = SystemAPI.GetComponent<InteractableObject>(action.InteractionObject).Name.ToString();
+				else
+					interactableName = "NPC #" + action.InteractionObject.Index;
 
-                // Either moving to the object or performing the action
-                if (SystemAPI.HasComponent<ActionPathfind>(entity))
-                {
-                    var pathfind = SystemAPI.GetComponent<ActionPathfind>(entity);
+				// Either moving to the object or performing the action
+				if (isPathfinding)
+				{
+					var pathfind = SystemAPI.GetComponent<ActionPathfind>(entity);
 					var socialRequest = SystemAPI.HasComponent<SocialRequest>(entity);
 					if (pathfind.DestinationReached)
 					{
 						if (!socialRequest)
 							goal = string.Format("Waiting for {0} to be free", interactableName);
-					} 
-                    else
-                        goal = string.Format("Moving to {0}", interactableName);
-                }
-                else
-                    goal = string.Format("Interacting with {0}", interactableName);
-            }
-            else
-            if (SystemAPI.HasComponent<Interaction>(entity))
-            {
-                var action = SystemAPI.GetComponent<Interaction>(entity);
+					}
+					else
+						goal = string.Format("Moving to {0}", interactableName);
+				}
+				else
+				{
+					goal = string.Format("Interacting with {0}", interactableName); // Shouldn't get here
+					Debug.Log("Error; UI showing impossible thing");
+				}
+			}
 
-                if (!SystemAPI.HasComponent<NPC>(action.InteractionObject))
-                    interactableName = SystemAPI.GetComponent<InteractableObject>(action.InteractionObject).Name.ToString();
-                else
-                    interactableName = "NPC #" + action.InteractionObject.Index;
-
-                if (!SystemAPI.HasComponent<ActionPathfind>(entity))
-                {
-                    goal = string.Format("Interacting with {0}", interactableName);
-                }
-            }
-
-            string npcName = "NPC #" + entity.Index.ToString();
+			string npcName = "NPC #" + entity.Index.ToString();
             SelectedEntityUI.Instance.UpdateUI(npc.ValueRO, needsList, changingNeeds, traitsList, npcName, goal);
 
 			isSelected = true;
@@ -85,7 +92,5 @@ public partial struct NPCSelectedUISystem : ISystem
 
 		if (!isSelected)
 			SelectedEntityUI.Instance.HideUI();
-
-
 	}
 }

@@ -1,11 +1,15 @@
+using Unity.Collections;
 using Unity.Entities;
 
 // Interaction: Added to an NPC entity while they are performing an Action.
 public struct Interaction: IComponentData
 {
+	public FixedString32Bytes Name;
     public Entity InteractionObject;
-	public EEmotion Emotion;
-	public EEmotionIndicator Reaction;
+	public EEmotion InitiatorEmotion;
+	public EEmotion TargetEmotion;
+	public EEmotionIndicator InitiatorReaction;
+	public EEmotionIndicator TargetReaction;
 	public float TimeElapsed;
 }
 
@@ -26,8 +30,11 @@ public enum EActionType
 
 public struct ActionAdvertisementBuffer : IBufferElementData
 {
+	public FixedString32Bytes Name;
     public int NeedAdvertisedIndex;
     public int NeedAdvertisedCount;
 	public EEmotion EmotionAdvertised;
-	public EEmotionIndicator Reaction;
+	public EEmotion TargetEmotion;
+	public EEmotionIndicator InitiatorReaction;
+	public EEmotionIndicator TargetReaction;
 }

@@ -46,12 +46,12 @@ public partial struct LongTermMemorySystem : ISystem
 
             // Filter out memories of the same type, keeping only the most intense memory of each type
             NativeArray<ShortTermMemoryBuffer> memoryFilteredTypes = new(shortMemoryArray.Length, Allocator.TempJob);
-            for (int t = 0; t < 2; t++)
+            for (int t = 0; t < (int)EEmotion.COUNT; t++)
             {
                 int bestMemoryOfType = -1;
                 for (int i = 0; i < shortMemoryArray.Length; i++)
                 {
-                    if (shortMemoryArray[i].Memory.Type != t)
+                    if ((int)shortMemoryArray[i].Memory.Type != t)
                         continue;
 
                     // First memory of type is automatically the best

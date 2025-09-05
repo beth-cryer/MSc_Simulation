@@ -10,4 +10,6 @@ public enum EEmotion
 	Surprise,
 	Fear,
 	Sadness,
+	Neutral,
+	COUNT,
 }
