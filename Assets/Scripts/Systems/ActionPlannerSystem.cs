@@ -84,69 +84,90 @@ public partial struct ActionPlannerSystem : ISystem
 						if (currentNeed.Value.Value[0] == needData.MaxValue[0]) continue; //if need is already at max value, skip it
 
 						float3 currentNeedValue = currentNeed.Value.Value;
-
-						// Value should be the value per second spent doing the action
-						// So get the projected end Need value of the Action, and divide by Duration
 						float advertisedValue = 0.0f;
-						float3 endResult = 0.0f;
-						switch (needAdvertised.ActionType)
+
+						// Mood is special case, here we check how close the current Mood value is to the target Mood value
+						if (needAdvertised.Need.Type == ENeed.Mood)
 						{
-							case (EActionType.SetNeed):
-								if (needAdvertised.InteractDuration == 0) continue; // if this happens then the interaction is configured wrong
-								endResult = needAdvertised.Need.Value;
-								advertisedValue = endResult[0] / needAdvertised.InteractDuration;
-								break;
-							case (EActionType.ModifyNeed):
-								if (needAdvertised.NeedValueChange[0] == 0) continue; // if this happens then the interaction is configured wrong
-
-								// If Duration is set, check if we'll reach MaxValue by the end of the Action's duration
-								if (needAdvertised.InteractDuration != 0f)
-								{
-									endResult = currentNeedValue + (needAdvertised.NeedValueChange * needAdvertised.InteractDuration);
-									if (endResult[0] < needData.MaxValue[0])
-									{
-										// If we won't, then just use the end result
-										advertisedValue = (endResult[0] - currentNeedValue[0]) / needAdvertised.InteractDuration;
-										break;
-									}
-								}
-
-								// Otherwise, calculate how long it will take to reach max value
-								// (max - current) / valueChangePerSecond
-								float3 amountChanged = needData.MaxValue - currentNeed.Value.Value;
-								float secondsToMax = amountChanged[0] / needAdvertised.NeedValueChange[0];
-								advertisedValue = (secondsToMax == 0)
-									? amountChanged[0]
-									: amountChanged[0] / secondsToMax;
-								break;
-
-
-							//  TODO: WRITE SWITCH FOR CALCULATING WEIGHT OF EMOTION-DEPENDENT NEED
-							//  (WILL BE BASED ON CLOSENESS OF CURRENT NEED VALUE TO NEED ADVERTISED)
 							//  NeedRange - Abs(Distance between Mood values) * Intensity
-							//
-						}
 
-						// Add trait modifiers to current need value
-						foreach (var trait in traits)
+							float3 currentMood = new(0.0f, 0.0f, 0.0f); //placeholder; substitute in the calculated mood later
+							float3 advertisedMood = blobAsset.Value.EmotionsData[(int)needAdvertised.Need.EmotionValue].PADValue;
+
+							// Add trait modifier (nudge currentMood value towards target)
+							foreach (var trait in traits)
+							{
+								if (trait.Trait.NeedModifier.Type != ENeed.Mood)
+									continue;
+								MathHelpers.MoveTowards(ref currentMood, ref advertisedMood, trait.Trait.MoodModifyAmount, out currentMood);
+							}
+
+							float moodDistance = math.abs(math.distance(currentMood, advertisedMood));
+
+							if (needAdvertised.InteractDuration == 0)
+								advertisedValue = moodDistance;
+							else
+								advertisedValue = moodDistance / needAdvertised.InteractDuration;
+
+						}
+						else
 						{
-							if (trait.Trait.NeedModifier.Type != needAdvertised.Need.Type)
-								continue;
-							currentNeedValue += trait.Trait.NeedModifier.Value;
+							// Value should be the value per second spent doing the action
+							// So get the projected end Need value of the Action, and divide by Duration
+							float3 endResult = 0.0f;
+							switch (needAdvertised.ActionType)
+							{
+								case (EActionType.SetNeed):
+									if (needAdvertised.InteractDuration == 0) continue; // if this happens then the interaction is configured wrong
+									endResult = needAdvertised.Need.Value;
+									advertisedValue = endResult[0] / needAdvertised.InteractDuration;
+									break;
+								case (EActionType.ModifyNeed):
+									if (needAdvertised.NeedValueChange[0] == 0) continue; // if this happens then the interaction is configured wrong
+
+									// If Duration is set, check if we'll reach MaxValue by the end of the Action's duration
+									if (needAdvertised.InteractDuration != 0f)
+									{
+										endResult = currentNeedValue + (needAdvertised.NeedValueChange * needAdvertised.InteractDuration);
+										if (endResult[0] < needData.MaxValue[0])
+										{
+											// If we won't, then just use the end result
+											advertisedValue = (endResult[0] - currentNeedValue[0]) / needAdvertised.InteractDuration;
+											break;
+										}
+									}
+
+									// Otherwise, calculate how long it will take to reach max value
+									// (max - current) / valueChangePerSecond
+									float3 amountChanged = needData.MaxValue - currentNeed.Value.Value;
+									float secondsToMax = amountChanged[0] / needAdvertised.NeedValueChange[0];
+									advertisedValue = (secondsToMax == 0)
+										? amountChanged[0]
+										: amountChanged[0] / secondsToMax;
+									break;
+							}
+
+							// Add trait modifiers to current need value
+							foreach (var trait in traits)
+							{
+								if (trait.Trait.NeedModifier.Type != needAdvertised.Need.Type)
+									continue;
+								currentNeedValue += trait.Trait.NeedModifier.Value;
+							}
+							currentNeedValue = math.clamp(currentNeedValue, needData.MinValue, needData.MaxValue);
+
+							// Get the advertised Need's scaling Curve, and evaluate position of the NPC's current Need value on the curve
+							// (needMax - currentNeed) / needMax
+							float modifiedNeedValue = math.clamp((needData.MaxValue - currentNeedValue) / needData.MaxValue, 0f, 1f)[0];
+							int curveIndex = (int)math.round(modifiedNeedValue * 99f);
+							float curveValue = needData.Curve[curveIndex];
+
+							weightedValue += advertisedValue * curveValue;
+
+							//Debug.Log(string.Format("need = {0}, weighted value = {1}, advertisedValue = {2} currentNeedValue = {3}, curveIndex = {4}, curveValue = {5}",
+							//	needAdvertised.Need.Type.ToString(), weightedValue, advertisedValue, currentNeedValue, curveIndex, curveValue));
 						}
-						currentNeedValue = math.clamp(currentNeedValue, needData.MinValue, needData.MaxValue);
 
-						// Get the advertised Need's scaling Curve, and evaluate position of the NPC's current Need value on the curve
-						// (needMax - currentNeed) / needMax
-						float modifiedNeedValue = math.clamp((needData.MaxValue - currentNeedValue) / needData.MaxValue, 0f, 1f)[0];
-						int curveIndex = (int)math.round(modifiedNeedValue * 99f);
-						float curveValue = needData.Curve[curveIndex];
-
-						weightedValue += advertisedValue * curveValue;
-
-						//Debug.Log(string.Format("need = {0}, weighted value = {1}, advertisedValue = {2} currentNeedValue = {3}, curveIndex = {4}, curveValue = {5}",
-						//	needAdvertised.Need.Type.ToString(), weightedValue, advertisedValue, currentNeedValue, curveIndex, curveValue));
-						
 					}
 
 					// Add distance from NPC

@@ -5,12 +5,20 @@ public class NPCActionIndicator: MonoBehaviour
 	[SerializeField] private SpriteRenderer m_spriteRenderer;
 	[SerializeField] private Sprite[] m_actionSprites;
 
-	public void SetIndicator(int index)
+	public Sprite GetIndicator(int index)
 	{
 		if (index < 0 || index > m_actionSprites.Length)
-			return;
+			return null;
 
-		m_spriteRenderer.enabled = index > 0;
-		m_spriteRenderer.sprite = m_actionSprites[index];
+		return m_actionSprites[index];
+	}
+
+	public static NPCActionIndicator Instance;
+	private void Awake()
+	{
+		if (Instance == null)
+			Instance = this;
+		else
+			Destroy(this);
 	}
 }

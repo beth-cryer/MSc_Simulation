@@ -1,5 +1,92 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3141750694895032045
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1369611495726836498}
+  - component: {fileID: 4109148459398365684}
+  m_Layer: 6
+  m_Name: Reaction
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1369611495726836498
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3141750694895032045}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.25, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4138216111063435326}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &4109148459398365684
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3141750694895032045}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: -786428761
+  m_SortingLayer: 1
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 0.5, y: 0.5}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 0
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
 --- !u!1 &9098243305692466381
 GameObject:
   m_ObjectHideFlags: 0
@@ -12,7 +99,6 @@ GameObject:
   - component: {fileID: 5925093379083325927}
   - component: {fileID: 9174238754137406374}
   - component: {fileID: 6775625976555071204}
-  - component: {fileID: 3569627158816474805}
   m_Layer: 6
   m_Name: NPC
   m_TagString: Untagged
@@ -32,7 +118,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1369611495726836498}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5925093379083325927
@@ -111,6 +198,7 @@ MonoBehaviour:
           x: 0
           y: 0
           z: 0
+        EmotionValue: 0
       ActionType: 1
       NeedValueChange:
         x: 10
@@ -121,8 +209,8 @@ MonoBehaviour:
       RequiredToCompleteAction: 1
     InitiatorEmotion: 10
     TargetEmotion: 10
-    InitiatorReaction: 0
-    TargetReaction: 0
+    InitiatorReaction: 1
+    TargetReaction: 1
   - Name: Hugging
     NeedAdvertised:
     - NeedAdvertised:
@@ -131,6 +219,7 @@ MonoBehaviour:
           x: 0
           y: 0
           z: 0
+        EmotionValue: 0
       ActionType: 1
       NeedValueChange:
         x: 15
@@ -141,7 +230,7 @@ MonoBehaviour:
       RequiredToCompleteAction: 1
     InitiatorEmotion: 1
     TargetEmotion: 1
-    InitiatorReaction: 0
+    InitiatorReaction: 4
     TargetReaction: 0
   - Name: Rejecting
     NeedAdvertised:
@@ -151,6 +240,7 @@ MonoBehaviour:
           x: 0
           y: 0
           z: 0
+        EmotionValue: 0
       ActionType: 1
       NeedValueChange:
         x: 10
@@ -161,8 +251,8 @@ MonoBehaviour:
       RequiredToCompleteAction: 1
     InitiatorEmotion: 10
     TargetEmotion: 4
-    InitiatorReaction: 0
-    TargetReaction: 0
+    InitiatorReaction: 5
+    TargetReaction: 8
   - Name: Insulting
     NeedAdvertised:
     - NeedAdvertised:
@@ -171,6 +261,7 @@ MonoBehaviour:
           x: 0
           y: 0
           z: 0
+        EmotionValue: 0
       ActionType: 1
       NeedValueChange:
         x: 10
@@ -179,10 +270,25 @@ MonoBehaviour:
       InteractDuration: 5
       MinInteractDuration: 5
       RequiredToCompleteAction: 1
+    - NeedAdvertised:
+        Type: 4
+        Value:
+          x: 0
+          y: 0
+          z: 0
+        EmotionValue: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 0
+        y: 0
+        z: 0
+      InteractDuration: 5
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 0
     InitiatorEmotion: 5
     TargetEmotion: 9
-    InitiatorReaction: 0
-    TargetReaction: 0
+    InitiatorReaction: 5
+    TargetReaction: 10
   - Name: Threatening
     NeedAdvertised:
     - NeedAdvertised:
@@ -191,6 +297,7 @@ MonoBehaviour:
           x: 0
           y: 0
           z: 0
+        EmotionValue: 0
       ActionType: 1
       NeedValueChange:
         x: 5
@@ -201,39 +308,45 @@ MonoBehaviour:
       RequiredToCompleteAction: 1
     InitiatorEmotion: 6
     TargetEmotion: 8
-    InitiatorReaction: 0
-    TargetReaction: 0
+    InitiatorReaction: 9
+    TargetReaction: 7
   NPCNeeds:
   - Type: 0
     Value:
       x: 100
       y: 0
       z: 0
+    EmotionValue: 0
   - Type: 1
     Value:
       x: 100
       y: 0
       z: 0
+    EmotionValue: 0
   - Type: 2
     Value:
       x: 100
       y: 0
       z: 0
+    EmotionValue: 0
   - Type: 3
     Value:
       x: 100
       y: 0
       z: 0
+    EmotionValue: 0
   - Type: 5
     Value:
       x: 100
       y: 0
       z: 0
+    EmotionValue: 0
   - Type: 4
     Value:
       x: 0
       y: 0
       z: 0
+    EmotionValue: 0
 --- !u!114 &6775625976555071204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -377,30 +490,3 @@ MonoBehaviour:
         Tag07: 0
     m_SerializedVersion: 1
   m_SerializedVersion: 1
---- !u!114 &3569627158816474805
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9098243305692466381}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dbd6fd25450f75148aa08fd6f2d8a144, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_spriteRenderer: {fileID: 0}
-  m_actionSprites:
-  - {fileID: 394450406, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: -900194993, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: -205619601, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: 1987407732, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: -461769298, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: 1242964792, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: 540398739, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: -1240396608, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: 2014345410, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: 1914657717, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: 329077123, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: 1895669052, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}
-  - {fileID: -60351244, guid: 215abba5db248d147a8e1ecc0b548559, type: 3}

@@ -23,9 +23,10 @@ MonoBehaviour:
           x: 0
           y: 0
           z: 0
+        EmotionValue: 0
       ActionType: 1
       NeedValueChange:
-        x: 5
+        x: 10
         y: 0
         z: 0
       InteractDuration: 8
@@ -37,6 +38,7 @@ MonoBehaviour:
           x: 0
           y: 0
           z: 0
+        EmotionValue: 0
       ActionType: 1
       NeedValueChange:
         x: 1
@@ -45,6 +47,8 @@ MonoBehaviour:
       InteractDuration: 0
       MinInteractDuration: 0
       RequiredToCompleteAction: 0
-    Emotion: 0
-    Reaction: 0
+    InitiatorEmotion: 0
+    TargetEmotion: 0
+    InitiatorReaction: 0
+    TargetReaction: 0
   InteractDistance: 0.5

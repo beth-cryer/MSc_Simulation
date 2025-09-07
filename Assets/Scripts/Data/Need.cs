@@ -7,6 +7,7 @@ public struct Need
 {
     public ENeed Type;
     public float3 Value;
+	public EEmotion EmotionValue; // left as None if not applicable
 }
 
 public enum ENeed
