@@ -39,13 +39,14 @@ public class NPCAgentAuthoring: MonoBehaviour
 			AddBuffer<TraitBuffer>(entity);
 			AddBuffer<ShortTermMemoryBuffer>(entity);
 			AddBuffer<LongTermMemoryBuffer>(entity);
+			AddBuffer<LongTermMemoryPeriod>(entity);
 
 			ShortTermMemory shortTermMemory = new()
 			{
-				TimeInterval = 30.0f,
+				TimeInterval = 60.0f,
 				MemoryLimit = 10,
 			};
-			AddComponent<ShortTermMemory>(entity, shortTermMemory);
+			AddComponent(entity, shortTermMemory);
 
 			// Add Social Actions
 			DynamicBuffer<ActionAdvertisementBuffer> actionsAdvertised = AddBuffer<ActionAdvertisementBuffer>(entity);

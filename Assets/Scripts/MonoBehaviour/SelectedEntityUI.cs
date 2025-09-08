@@ -16,11 +16,13 @@ public class SelectedEntityUI : MonoBehaviour
 
     private NeedData[] m_needData;
     private TraitData[] m_traitData;
+	private EmotionData[] m_emotionData;
 
     private void Start()
     {
         m_needData = Resources.LoadAll<NeedData>("Data/Needs/");
 		m_traitData = Resources.LoadAll<TraitData>("Data/Traits/");
+		m_emotionData = Resources.LoadAll<EmotionData>("Data/Emotions/");
 	}
 
 	public void HideUI()
@@ -32,7 +34,22 @@ public class SelectedEntityUI : MonoBehaviour
     {
 		m_entityLayoutGroup.alpha = 1.0f;
 
-		string text = string.Format("{0}\n\nGOAL:\n{1}", name, goal);
+		float3 moodValue = needs.FirstOrDefault(x => x.Type.Equals(ENeed.Mood)).Value;
+		int moodIndex = 0;
+		float bestDistance = Mathf.Infinity;
+		for (int i = 0; i < m_emotionData.Length; i++)
+		{
+			float distance = math.distance(moodValue, m_emotionData[i].PADValue);
+			if (distance < bestDistance)
+			{
+				bestDistance = distance;
+				moodIndex = i;
+			}
+		}
+		//string emotionName = string.Format(m_emotionData[moodIndex].Name + " - " + moodValue.ToString());
+		string emotionName = m_emotionData[moodIndex].Name;
+
+		string text = string.Format("{0}\n\nGOAL:\n{1}\n\nMOOD: {2}", name, goal, emotionName);
 		string textTraits = "";
 		foreach (var trait in traits)
 		{

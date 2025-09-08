@@ -19,7 +19,7 @@ public partial struct LongTermMemorySystem : ISystem
             if (memory.ValueRO.TimeSinceLastInterval < memory.ValueRO.TimeInterval)
                 continue;
 
-            if (memory.ValueRO.QueueLongTermMemory)
+            if (!memory.ValueRO.QueueLongTermMemory)
                 memory.ValueRW.QueueLongTermMemory = true;
 
             // Reset memory interval timer
@@ -27,15 +27,16 @@ public partial struct LongTermMemorySystem : ISystem
         }
 
         // Process NPCs
-        foreach (var (memory, shortMemoryBuffer, longMemoryBuffer, longMemoryPeriodBuffer, npcEntity)
+        foreach (var (memory, shortMemoryBuffer, longMemoryBuffer, npcEntity)
             in SystemAPI.Query<RefRW<ShortTermMemory>, DynamicBuffer<ShortTermMemoryBuffer>,
-            DynamicBuffer<LongTermMemoryBuffer>, DynamicBuffer <LongTermMemoryPeriod>>()
+            DynamicBuffer<LongTermMemoryBuffer>>()
 			.WithPresent<NPC>()
             .WithEntityAccess())
         {
             if (!memory.ValueRO.QueueLongTermMemory)
                 continue;
 
+			/*
             // Create long term memory
             NativeArray<ShortTermMemoryBuffer> shortMemoryArray = shortMemoryBuffer.AsNativeArray();
 
@@ -71,18 +72,19 @@ public partial struct LongTermMemorySystem : ISystem
 
                 memoryFilteredTypes[memoryFilteredTypes.Length-1] = shortMemoryArray[bestMemoryOfType];
             }
+			*/
 
-            //longMemoryArray.GroupBy(m => m.Memory.Type).Select(g => g.First());
-            // (could have been this 1 line but alas....burstcompiler my nemesis......)
+			//longMemoryArray.GroupBy(m => m.Memory.Type).Select(g => g.First());
+			// (could have been this 1 line but alas....burstcompiler my nemesis......)
 
-            // Take top MemoryLimit num. of short term memories into long term memory
-            int longTermLength = 0;
+			// Take top MemoryLimit num. of short term memories into long term memory
+			int longTermLength = 0;
             for (int i = 0; i < memory.ValueRO.MemoryLimit; i++)
             {
-                if (i > shortMemoryArray.Length)
+                if (i >= shortMemoryBuffer.Length)
                     break;
 
-                LongTermMemoryBuffer copyMemory = new() { Memory = shortMemoryArray[i].Memory };
+                LongTermMemoryBuffer copyMemory = new() { Memory = shortMemoryBuffer[i].Memory };
                 ecb.AppendToBuffer(npcEntity, copyMemory);
                 longTermLength++;
             }

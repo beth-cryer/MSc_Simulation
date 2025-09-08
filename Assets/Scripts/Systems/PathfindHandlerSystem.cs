@@ -17,7 +17,7 @@ public partial struct PathfindHandlerSystem : ISystem
         // Pathfinding
         foreach (var (npc, npcTransform, pathfinding, action, entity)
             in SystemAPI.Query<RefRO<NPC>, RefRW<LocalTransform>, RefRW<ActionPathfind>, RefRO<QueuedAction>>()
-			.WithNone<SocialRequest>()
+			.WithNone<SocialRequest, InUseTag>()
             .WithEntityAccess())
         {
             if (pathfinding.ValueRO.DestinationReached)
