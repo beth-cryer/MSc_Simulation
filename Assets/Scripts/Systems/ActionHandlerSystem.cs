@@ -5,6 +5,7 @@ using Unity.Mathematics;
 
 // Look for NPC Entities with an Action component and execute those actions
 
+[BurstCompile]
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public partial struct ActionHandlerSystem : ISystem
 {
@@ -17,6 +18,12 @@ public partial struct ActionHandlerSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+		BlobSingleton blob;
+		if (!SystemAPI.TryGetSingleton<BlobSingleton>(out blob))
+		{
+			return;
+		}
+
         BlobAssetReference<ObjectsBlobAsset> blobAsset = SystemAPI.GetSingleton<BlobSingleton>().BlobAssetReference;
         EntityCommandBuffer ecb = new(Allocator.TempJob);
 

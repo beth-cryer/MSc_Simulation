@@ -5,9 +5,16 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 // Look for NPC Entities and calculate Mood based on Short Term Memories (plus smaller influence from long term)
+[BurstCompile]
 [UpdateInGroup(typeof(ActionRefreshSystemGroup))]
 public partial struct MoodCalculationSystem : ISystem
 {
+	[BurstCompile]
+	public void OnCreate(ref SystemState state)
+	{
+		state.RequireForUpdate<BlobSingleton>();
+	}
+
 	[BurstCompile]
 	public void OnUpdate(ref SystemState state)
 	{

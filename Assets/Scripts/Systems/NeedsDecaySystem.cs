@@ -2,20 +2,26 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEngine;
 
+[BurstCompile]
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public partial struct NeedsDecaySystem : ISystem
 {
-    //TODO OPTIMIZATION:
-    // instead of doing this every frame, just run the calculation whenever it's relevant
-    // and check the time elapsed since last update to extrapolate the current Need value
+	//TODO OPTIMIZATION:
+	// instead of doing this every frame, just run the calculation whenever it's relevant
+	// and check the time elapsed since last update to extrapolate the current Need value
 
-    // this will actually naturally mean that needs don't decay while an action is updating them,
-    // as the timeSinceLastSet can be set to 0 when updated
-    // just have to remember to actually do the update in the action planner since Need values must be current there
+	// this will actually naturally mean that needs don't decay while an action is updating them,
+	// as the timeSinceLastSet can be set to 0 when updated
+	// just have to remember to actually do the update in the action planner since Need values must be current there
 
-    [BurstCompile]
+	[BurstCompile]
+	public void OnCreate(ref SystemState state)
+	{
+		state.RequireForUpdate<BlobSingleton>();
+	}
+
+	[BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         BlobAssetReference<ObjectsBlobAsset> blobAsset = SystemAPI.GetSingleton<BlobSingleton>().BlobAssetReference;

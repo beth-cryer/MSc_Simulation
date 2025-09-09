@@ -7,6 +7,7 @@ using Unity.Transforms;
 using UnityEngine;
 
 // Lot of nested iteration over all entities happens here, so we limit it to a less frequent tick rate
+[BurstCompile]
 [UpdateInGroup(typeof(ActionRefreshSystemGroup))]
 public partial struct ActionPlannerSystem : ISystem
 {

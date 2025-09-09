@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
+[BurstCompile]
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public partial struct PathfindHandlerSystem : ISystem
 {

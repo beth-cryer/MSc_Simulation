@@ -3,13 +3,20 @@ using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
 
-[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+[UpdateInGroup(typeof(ActionRefreshSystemGroup))]
 public partial struct NPCReactionUISystem : ISystem
 {
 	public void OnUpdate(ref SystemState state)
 	{
+		var worldSpawner = SystemAPI.GetSingleton<WorldSpawner>();
+		if (worldSpawner.WaitToStartGame < 0.1f)
+		{
+			return;
+		}
+
 		foreach (var (needs, interaction, entity) in
 			SystemAPI.Query<DynamicBuffer<NeedBuffer>, RefRW<Interaction>>()
+			.WithAll<NPC>()
 			.WithNone<ActionPathfind, SocialRequest, InUseTag>()
 			.WithEntityAccess())
 		{
@@ -49,12 +56,12 @@ public partial struct NPCReactionUISystem : ISystem
 
 		// Clear the Reaction sprite of all NPCs outside of interactions,
 		// and with no SocialRequest (which indicates they should be set to TargetReaction sprite)
-		foreach (var (npc, entity) in
+		foreach (var (npc, entityClear) in
 			SystemAPI.Query<RefRO<NPC>>()
 			.WithNone<Interaction, SocialRequest, InUseTag>()
 			.WithEntityAccess())
 		{
-			var buffer = state.EntityManager.GetBuffer<Child>(entity);
+			var buffer = state.EntityManager.GetBuffer<Child>(entityClear);
 
 			if (buffer.Length <= 0)
 				continue;

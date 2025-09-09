@@ -4,6 +4,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
+[BurstCompile]
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public partial struct LongTermMemorySystem : ISystem
 {

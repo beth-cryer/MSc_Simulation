@@ -222,7 +222,7 @@ MonoBehaviour:
   - {fileID: 3661405651164700961, guid: cd0622d4ed9064f40919da09e0463fab, type: 3}
   - {fileID: 3661405651164700961, guid: 27377d9248e998e478738b3c93cf6542, type: 3}
   - {fileID: 3661405651164700961, guid: 19f52cef82d9d834a9c308587ae1bc0e, type: 3}
-  WorldScale: 15
+  WorldScale: 20
 --- !u!4 &1375905195
 Transform:
   m_ObjectHideFlags: 0
