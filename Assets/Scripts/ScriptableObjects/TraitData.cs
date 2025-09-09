@@ -9,6 +9,15 @@ public class TraitData : ScriptableObject
 	public string Name;
 	public ETrait Type;
 	public List<TraitModifierData> NeedModifiers;
+	public List<TraitModifierData> AddNeed;
+	public MoodModifierData ModifyMood;
+}
+
+[Serializable]
+public class MoodModifierData
+{
+	public EEmotion MoodModifyType;
+	public float MoodModifyAmount;
 }
 
 [Serializable]

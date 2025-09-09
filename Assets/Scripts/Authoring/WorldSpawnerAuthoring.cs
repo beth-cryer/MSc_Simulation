@@ -34,6 +34,8 @@ public class WorldSpawnerAuthoring : MonoBehaviour
 struct WorldSpawner : IComponentData
 {
 	public int WorldScale;
+	public int WorldInteractablesCount;
+	public float WaitToStartGame;
 }
 
 struct WorldPrefab: IBufferElementData

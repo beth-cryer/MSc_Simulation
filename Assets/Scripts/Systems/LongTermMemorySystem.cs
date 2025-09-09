@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public partial struct LongTermMemorySystem : ISystem
@@ -36,8 +37,8 @@ public partial struct LongTermMemorySystem : ISystem
             if (!memory.ValueRO.QueueLongTermMemory)
                 continue;
 
-			/*
             // Create long term memory
+			/*
             NativeArray<ShortTermMemoryBuffer> shortMemoryArray = shortMemoryBuffer.AsNativeArray();
 
             // Sort short term memories by emotion intensity
@@ -89,11 +90,27 @@ public partial struct LongTermMemorySystem : ISystem
                 longTermLength++;
             }
 
-            // Calculate and store Mood
+			// Calculate and store Mood
+			//
+			double timeElapsedCurrent = SystemAPI.Time.ElapsedTime;
+			float runningWeightedLength = 0f;
+			float3 runningTotal = 0f;
+			foreach (var shortMemory in shortMemoryBuffer)
+			{
+				float timeElapsed = (float)math.clamp(timeElapsedCurrent - shortMemory.Memory.TimeElapsed, 0f, 60f);
+				runningWeightedLength += 1 - (timeElapsed / 60.0f);
+				runningTotal += shortMemory.Memory.EmotionResponse;
+			}
+			float3 mood = (runningWeightedLength > 0f) ?
+				runningTotal / runningWeightedLength
+				: new(0.0f, 0.0f, 0.0f);
+			// (TODO: make this not copy-pasted from MoodCalculationSystem, ideally)
 
-            // Store position of long term memory period in the flattened memory buffer
-            LongTermMemoryPeriod longTermMemoryPeriod = new()
+			// Store position of long term memory period in the flattened memory buffer
+			LongTermMemoryPeriod longTermMemoryPeriod = new()
             {
+				MemoryPeriodMood = mood,
+				MemoryTimeElapsed = SystemAPI.Time.ElapsedTime,
                 LongTermMemoryIndex = longMemoryBuffer.Length,
                 LongTermMemoryCount = longTermLength,
             };
@@ -112,10 +129,13 @@ public partial struct LongTermMemorySystem : ISystem
     [BurstCompile]
     public int Compare(ShortTermMemoryBuffer x, ShortTermMemoryBuffer y)
     {
-        if (x.Memory.EmotionResponse[0] < y.Memory.EmotionResponse[0])
-            return -1;
+		float memValueX = math.abs(x.Memory.EmotionResponse[0]) + math.abs(x.Memory.EmotionResponse[1]) + math.abs(x.Memory.EmotionResponse[2]);
+		float memValueY = math.abs(y.Memory.EmotionResponse[0]) + math.abs(y.Memory.EmotionResponse[1]) + math.abs(y.Memory.EmotionResponse[2]);
 
-        if (x.Memory.EmotionResponse[0] > y.Memory.EmotionResponse[0])
+		if (memValueX < memValueY)
+			return -1;
+
+        if (memValueX > memValueY)
             return 1;
 
         return 0;

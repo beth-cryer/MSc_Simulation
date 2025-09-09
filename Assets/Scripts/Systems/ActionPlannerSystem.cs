@@ -13,6 +13,7 @@ public partial struct ActionPlannerSystem : ISystem
 	[BurstCompile]
 	public void OnCreate(ref SystemState state)
 	{
+		state.RequireForUpdate<WorldSpawner>();
 		state.RequireForUpdate<BlobSingleton>();
 		state.RequireForUpdate<RandomSingleton>();
 	}
@@ -21,6 +22,13 @@ public partial struct ActionPlannerSystem : ISystem
 	public void OnUpdate(ref SystemState state)
 	{
 		Debug.Log("AI update tick");
+
+		var worldSpawner = SystemAPI.GetSingletonRW<WorldSpawner>();
+		if (worldSpawner.ValueRO.WaitToStartGame < 0.1f)
+		{
+			worldSpawner.ValueRW.WaitToStartGame += SystemAPI.Time.DeltaTime;
+			return;
+		}
 
 		// Get Needs Curves from BlobAsset
 		BlobAssetReference<ObjectsBlobAsset> blobAsset = SystemAPI.GetSingleton<BlobSingleton>().BlobAssetReference;
@@ -38,15 +46,15 @@ public partial struct ActionPlannerSystem : ISystem
 			float3 npcPos = npcTransform.ValueRO.Position;
 
 			// TODO: Maintain a count of all interactables in a singleton somewhere
-			NativeArray<WeightedAction> weights = new(1000, Allocator.TempJob);
+			NativeArray<WeightedAction> weights = new(10000, Allocator.TempJob);
 			int weightCount = 0;
 			float sumOfWeights = 0;
 
 			// Loop through each Interactable, check their Advertised Needs and calculate their Utility weight
 			foreach (var (obj, objTransform, objTransformWorld, actionsAdvertised, needsAdvertised, objEntity) in
-				SystemAPI.Query<RefRO<InteractableObject>, RefRO<LocalTransform>, RefRO<LocalToWorld>, DynamicBuffer<ActionAdvertisementBuffer>, DynamicBuffer <NeedAdvertisementBuffer>>()
-				.WithNone<InUseTag, ActionPathfind>()
-				.WithEntityAccess())
+			SystemAPI.Query<RefRO<InteractableObject>, RefRO<LocalTransform>, RefRO<LocalToWorld>, DynamicBuffer<ActionAdvertisementBuffer>, DynamicBuffer <NeedAdvertisementBuffer>>()
+			.WithNone<InUseTag, ActionPathfind>()
+			.WithEntityAccess())
 			{
 				// Can't interact with yourself
 				if (objEntity.Equals(npcEntity))
@@ -89,15 +97,14 @@ public partial struct ActionPlannerSystem : ISystem
 						// Mood is special case, here we check how close the current Mood value is to the target Mood value
 						if (needAdvertised.Need.Type == ENeed.Mood)
 						{
-							//  NeedRange - Abs(Distance between Mood values) * Intensity
-
-							float3 currentMood = new(0.0f, 0.0f, 0.0f); //placeholder; substitute in the calculated mood later
+							float3 currentMood = currentNeed.Value.Value;
 							float3 advertisedMood = blobAsset.Value.EmotionsData[(int)needAdvertised.Need.EmotionValue].PADValue;
 
-							// Add trait modifier (nudge currentMood value towards target)
+							// Add trait modifiers (nudge currentMood value towards target,
+							// for any Trait with same MoodModifyEmotion type as the NeedAdvertised)
 							foreach (var trait in traits)
 							{
-								if (trait.Trait.NeedModifier.Type != ENeed.Mood)
+								if (trait.Trait.MoodModifyEmotion != needAdvertised.Need.EmotionValue)
 									continue;
 								MathHelpers.MoveTowards(ref currentMood, ref advertisedMood, trait.Trait.MoodModifyAmount, out currentMood);
 							}

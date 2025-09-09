@@ -17,7 +17,7 @@ public class NPCAgentAuthoring: MonoBehaviour
             NPC npc = new()
             {
                 Name = npcName,
-                Speed = 5.0f
+                Speed = 3.0f
             };
 
             DynamicBuffer<NeedBuffer> needs = AddBuffer<NeedBuffer>(entity);
@@ -87,7 +87,8 @@ public class NPCAgentAuthoring: MonoBehaviour
 			InteractableObject interactable = new()
 			{
 				Name = npcName,
-				InteractDistance = 0.7f
+				InteractDistance = 0.7f,
+				ActionsAdvertisedCount = authoring.ActionsAdvertised.Length,
 			};
             AddComponent(entity, interactable);
         }

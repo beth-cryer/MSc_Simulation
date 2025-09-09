@@ -15,8 +15,9 @@ public struct LongTermMemoryBuffer : IBufferElementData
 
 public struct Memory
 {
-    public EEmotion Type;
-    public float3 EmotionResponse;
+	public float3 EmotionResponse;
+	public double TimeElapsed;
+	public EEmotion Type;
 }
 
 public struct ShortTermMemory: IComponentData
@@ -30,6 +31,7 @@ public struct ShortTermMemory: IComponentData
 public struct LongTermMemoryPeriod: IBufferElementData
 {
     public float3 MemoryPeriodMood;
+	public double MemoryTimeElapsed;
     public int LongTermMemoryIndex;
     public int LongTermMemoryCount;
 }

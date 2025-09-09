@@ -33,7 +33,7 @@ public class BlobAuthoring: MonoBehaviour
             // Load Needs data from ScriptableObjects in the Resources folder
             // https://discussions.unity.com/t/populating-an-array-with-scriptable-objects-directly-through-script/849860/3
             NeedData[] NeedData = Resources.LoadAll<NeedData>("Data/Needs/");
-            BlobBuilderArray<NeedsData> needsArray = blobBuilder.Allocate(ref blobAsset.NeedsData, NeedData.Length);
+            BlobBuilderArray<NeedsData> needsArray = blobBuilder.Allocate(ref blobAsset.NeedsData, (int)ENeed.COUNT);
 
             // Populate Blob Data with Needs and generate arrays from curves
             for (int i = 0; i < NeedData.Length; i++)
@@ -55,20 +55,37 @@ public class BlobAuthoring: MonoBehaviour
 
 			// Load Traits Data
 			TraitData[] TraitData = Resources.LoadAll<TraitData>("Data/Traits/");
-			BlobBuilderArray<TraitsData> traitsArray = blobBuilder.Allocate(ref blobAsset.TraitsData, TraitData.Length);
+			BlobBuilderArray<TraitsData> traitsArray = blobBuilder.Allocate(ref blobAsset.TraitsData, (int)ETrait.COUNT);
 			for (int i = 0; i < TraitData.Length; i++)
 			{
 				int index = (int)TraitData[i].Type;
+				TraitModifierData needModifier = TraitData[i].NeedModifiers.Count > 0
+					? TraitData[i].NeedModifiers[0]
+					: new TraitModifierData() { };
+
+				TraitModifierData addNeed = TraitData[i].AddNeed.Count > 0
+					? TraitData[i].AddNeed[0]
+					: new TraitModifierData() { };
+
 				traitsArray[index] = new()
 				{
 					Trait = new()
 					{
+						Type = TraitData[i].Type,
+						ModifyNeed = TraitData[i].NeedModifiers.Count > 0,
 						NeedModifier = new()
 						{
-							Type = TraitData[i].NeedModifiers[0].Need,
-							Value = TraitData[i].NeedModifiers[0].Modifier,
+							Type = needModifier.Need,
+							Value = needModifier.Modifier,
 						},
-						Type = TraitData[i].Type,
+						AddNeed = TraitData[i].AddNeed.Count > 0,
+						AddNeedType = new()
+						{
+							Type = addNeed.Need,
+							Value = addNeed.Modifier,
+						},
+						MoodModifyEmotion = TraitData[i].ModifyMood.MoodModifyType,
+						MoodModifyAmount = TraitData[i].ModifyMood.MoodModifyAmount,
 					}
 				};
 			}

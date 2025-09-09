@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fea011a6385c3e442bc1bbd90952be1d, type: 3}
+  m_Name: Need_Dancer
+  m_EditorClassIdentifier: 
+  Name: Dancer
+  Type: 6
+  MinValue:
+    x: 0
+    y: 0
+    z: 0
+  ZeroValue:
+    x: 0
+    y: 0
+    z: 0
+  MaxValue:
+    x: 100
+    y: 0
+    z: 0
+  DecayRate:
+    x: 1
+    y: 0
+    z: 0
+  IsVisibleNeed: 0
+  Curve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.1
+      inSlope: -0.90259737
+      outSlope: 0.4
+      tangentMode: 65
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.052757792
+    - serializedVersion: 3
+      time: 1
+      value: 0.5
+      inSlope: 0.46935192
+      outSlope: 0.00644714
+      tangentMode: 65
+      weightedMode: 0
+      inWeight: 0.0527578
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

@@ -20,3 +20,7 @@ MonoBehaviour:
       x: 20
       y: 0
       z: 0
+  AddNeed: []
+  ModifyMood:
+    MoodModifyType: 0
+    MoodModifyAmount: 0

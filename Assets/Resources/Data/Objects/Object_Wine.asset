@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2eeebd0ed8580ba4585641ca9b7c0a89, type: 3}
+  m_Name: Object_Wine
+  m_EditorClassIdentifier: 
+  Name: Wine
+  Sprite: {fileID: 1328147071604349809, guid: 498d6c33c89360e43b56b0934609c613, type: 3}
+  ActionsAdvertised:
+  - Name: Drinking
+    NeedAdvertised:
+    - NeedAdvertised:
+        Type: 0
+        Value:
+          x: 0
+          y: 0
+          z: 0
+        EmotionValue: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 5
+        y: 0
+        z: 0
+      InteractDuration: 8
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 1
+    - NeedAdvertised:
+        Type: 1
+        Value:
+          x: 0
+          y: 0
+          z: 0
+        EmotionValue: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 1
+        y: 0
+        z: 0
+      InteractDuration: 0
+      MinInteractDuration: 0
+      RequiredToCompleteAction: 0
+    InitiatorEmotion: 2
+    TargetEmotion: 0
+    InitiatorReaction: 12
+    TargetReaction: 0
+  InteractDistance: 0.5

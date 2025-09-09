@@ -228,10 +228,25 @@ MonoBehaviour:
       InteractDuration: 5
       MinInteractDuration: 5
       RequiredToCompleteAction: 1
+    - NeedAdvertised:
+        Type: 3
+        Value:
+          x: 0
+          y: 0
+          z: 0
+        EmotionValue: 1
+      ActionType: 1
+      NeedValueChange:
+        x: 0
+        y: 0
+        z: 0
+      InteractDuration: 5
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 0
     InitiatorEmotion: 1
     TargetEmotion: 1
     InitiatorReaction: 4
-    TargetReaction: 0
+    TargetReaction: 4
   - Name: Rejecting
     NeedAdvertised:
     - NeedAdvertised:
@@ -249,6 +264,21 @@ MonoBehaviour:
       InteractDuration: 5
       MinInteractDuration: 5
       RequiredToCompleteAction: 1
+    - NeedAdvertised:
+        Type: 4
+        Value:
+          x: 0
+          y: 0
+          z: 0
+        EmotionValue: 5
+      ActionType: 1
+      NeedValueChange:
+        x: 0
+        y: 0
+        z: 0
+      InteractDuration: 0
+      MinInteractDuration: 0
+      RequiredToCompleteAction: 0
     InitiatorEmotion: 10
     TargetEmotion: 4
     InitiatorReaction: 5
@@ -276,7 +306,7 @@ MonoBehaviour:
           x: 0
           y: 0
           z: 0
-        EmotionValue: 0
+        EmotionValue: 6
       ActionType: 1
       NeedValueChange:
         x: 0
@@ -310,6 +340,99 @@ MonoBehaviour:
     TargetEmotion: 8
     InitiatorReaction: 9
     TargetReaction: 7
+  - Name: Telling joke to
+    NeedAdvertised:
+    - NeedAdvertised:
+        Type: 3
+        Value:
+          x: 0
+          y: 0
+          z: 0
+        EmotionValue: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 5
+        y: 0
+        z: 0
+      InteractDuration: 5
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 1
+    InitiatorEmotion: 2
+    TargetEmotion: 1
+    InitiatorReaction: 1
+    TargetReaction: 2
+  - Name: Venting to
+    NeedAdvertised:
+    - NeedAdvertised:
+        Type: 3
+        Value:
+          x: 0
+          y: 0
+          z: 0
+        EmotionValue: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 5
+        y: 0
+        z: 0
+      InteractDuration: 5
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 1
+    InitiatorEmotion: 3
+    TargetEmotion: 9
+    InitiatorReaction: 8
+    TargetReaction: 10
+  - Name: Dancing with
+    NeedAdvertised:
+    - NeedAdvertised:
+        Type: 3
+        Value:
+          x: 0
+          y: 0
+          z: 0
+        EmotionValue: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 15
+        y: 0
+        z: 0
+      InteractDuration: 8
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 1
+    - NeedAdvertised:
+        Type: 6
+        Value:
+          x: 100
+          y: 0
+          z: 0
+        EmotionValue: 0
+      ActionType: 0
+      NeedValueChange:
+        x: 15
+        y: 0
+        z: 0
+      InteractDuration: 8
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 0
+    - NeedAdvertised:
+        Type: 0
+        Value:
+          x: 0
+          y: 0
+          z: 0
+        EmotionValue: 2
+      ActionType: 1
+      NeedValueChange:
+        x: 0
+        y: 0
+        z: 0
+      InteractDuration: 8
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 0
+    InitiatorEmotion: 1
+    TargetEmotion: 1
+    InitiatorReaction: 6
+    TargetReaction: 6
   NPCNeeds:
   - Type: 0
     Value:

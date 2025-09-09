@@ -37,12 +37,15 @@ public partial struct NPCSelectedUISystem : ISystem
 				else
 					interactableName = "NPC #" + action.InteractionObject.Index;
 
-				//Done pathfinding, thus we are doing the action-
-				if (!SystemAPI.HasComponent<ActionPathfind>(entity))
+				if (SystemAPI.HasComponent<SocialRequest>(entity))
+				{
+					goal = "Being interacted with";
+				}
+				else if (!SystemAPI.HasComponent<ActionPathfind>(entity))
 				{
 					goal = string.Format("{0} {1}", actionName, interactableName); //Print the action and interactable name
 
-					// Highligh
+					// Highlight active need UI
 					if (SystemAPI.HasBuffer<InteractionBuffer>(entity))
 					{
 						var interactionBuffer = SystemAPI.GetBuffer<InteractionBuffer>(entity);

@@ -13,13 +13,13 @@ public class InteractableObjectAuthoring : MonoBehaviour
         {
             Entity entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
 
-            // Add Interactable component to object Entity
-            InteractableObject obj = new()
-            {
-                Name = new FixedString32Bytes(authoring.ObjectData.Name),
+			// Add Interactable component to object Entity
+			InteractableObject obj = new()
+			{
+				Name = new FixedString32Bytes(authoring.ObjectData.Name),
 				InteractDistance = authoring.ObjectData.InteractDistance,
-				
-            };
+				ActionsAdvertisedCount = authoring.ObjectData.ActionsAdvertised.Count,
+			};
             AddComponent(entity, obj);
 
             DynamicBuffer<ActionAdvertisementBuffer> actionsAdvertised = AddBuffer<ActionAdvertisementBuffer>(entity);

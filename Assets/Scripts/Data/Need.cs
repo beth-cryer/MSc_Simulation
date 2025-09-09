@@ -18,6 +18,8 @@ public enum ENeed
     Social,
     Mood,
     Fun,
+	Dancer,
+	COUNT,
 }
 
 [InternalBufferCapacity(8)]

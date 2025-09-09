@@ -5,4 +5,5 @@ public struct InteractableObject: IComponentData
 {
     public FixedString32Bytes Name;
 	public float InteractDistance;
+	public int ActionsAdvertisedCount;
 }
