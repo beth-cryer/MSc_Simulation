@@ -723,7 +723,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   camMoveSpeed: 5
   camFastMultiplier: 4
-  camZoomSpeed: -5
+  camZoomSpeed: -3.5
   camZoomMin: 4
   camZoomMax: 25
 --- !u!1 &619394800

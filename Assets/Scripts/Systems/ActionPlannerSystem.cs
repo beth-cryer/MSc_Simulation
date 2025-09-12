@@ -47,7 +47,7 @@ public partial struct ActionPlannerSystem : ISystem
 			float3 npcPos = npcTransform.ValueRO.Position;
 
 			// TODO: Maintain a count of all interactables in a singleton somewhere
-			NativeArray<WeightedAction> weights = new(10000, Allocator.TempJob);
+			NativeArray<WeightedAction> weights = new(500, Allocator.TempJob);
 			int weightCount = 0;
 			float sumOfWeights = 0;
 

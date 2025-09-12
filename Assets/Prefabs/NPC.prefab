@@ -393,7 +393,7 @@ MonoBehaviour:
         EmotionValue: 0
       ActionType: 1
       NeedValueChange:
-        x: 15
+        x: 10
         y: 0
         z: 0
       InteractDuration: 8
@@ -429,6 +429,21 @@ MonoBehaviour:
       InteractDuration: 8
       MinInteractDuration: 5
       RequiredToCompleteAction: 0
+    - NeedAdvertised:
+        Type: 5
+        Value:
+          x: 0
+          y: 0
+          z: 0
+        EmotionValue: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 5
+        y: 0
+        z: 0
+      InteractDuration: 8
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 1
     InitiatorEmotion: 1
     TargetEmotion: 1
     InitiatorReaction: 6

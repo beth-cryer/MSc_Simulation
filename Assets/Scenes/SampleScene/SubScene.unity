@@ -218,11 +218,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ObjectPrefabs:
   - {fileID: 3661405651164700961, guid: dac64a7937e8be14684c16829fdefe74, type: 3}
-  - {fileID: 3661405651164700961, guid: c2b659a61e0161b4db0a3a4ebf374905, type: 3}
-  - {fileID: 3661405651164700961, guid: cd0622d4ed9064f40919da09e0463fab, type: 3}
-  - {fileID: 3661405651164700961, guid: 27377d9248e998e478738b3c93cf6542, type: 3}
-  - {fileID: 3661405651164700961, guid: 19f52cef82d9d834a9c308587ae1bc0e, type: 3}
-  WorldScale: 20
+  WorldScale: 3
 --- !u!4 &1375905195
 Transform:
   m_ObjectHideFlags: 0
@@ -291,7 +287,7 @@ MonoBehaviour:
   - {fileID: 5828403917900642454, guid: 79f769910f87223449ad56ff2870f99b, type: 3}
   - {fileID: 3888561972207939905, guid: 23d2c584fbec0204b879471bdef1e795, type: 3}
   - {fileID: 2969081991376895632, guid: 434fbd9921efeed4a97480c17eb5ffce, type: 3}
-  SpawnAmount: 500
+  SpawnAmount: 10
 --- !u!1 &2035598958
 GameObject:
   m_ObjectHideFlags: 0
@@ -321,7 +317,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3acd36832512d884b92cec8173ba30b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  randomSeed: 135
+  randomSeed: 6969
 --- !u!4 &2035598960
 Transform:
   m_ObjectHideFlags: 0

@@ -33,6 +33,21 @@ MonoBehaviour:
       MinInteractDuration: 5
       RequiredToCompleteAction: 1
     - NeedAdvertised:
+        Type: 5
+        Value:
+          x: 0
+          y: 0
+          z: 0
+        EmotionValue: 0
+      ActionType: 1
+      NeedValueChange:
+        x: 5
+        y: 0
+        z: 0
+      InteractDuration: 8
+      MinInteractDuration: 5
+      RequiredToCompleteAction: 1
+    - NeedAdvertised:
         Type: 1
         Value:
           x: 0

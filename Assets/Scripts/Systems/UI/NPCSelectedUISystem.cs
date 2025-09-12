@@ -37,11 +37,7 @@ public partial struct NPCSelectedUISystem : ISystem
 				else
 					interactableName = "NPC #" + action.InteractionObject.Index;
 
-				if (SystemAPI.HasComponent<SocialRequest>(entity))
-				{
-					goal = "Being interacted with";
-				}
-				else if (!SystemAPI.HasComponent<ActionPathfind>(entity))
+				if (!SystemAPI.HasComponent<ActionPathfind>(entity))
 				{
 					goal = string.Format("{0} {1}", actionName, interactableName); //Print the action and interactable name
 
@@ -59,7 +55,7 @@ public partial struct NPCSelectedUISystem : ISystem
 			}else
 			if (SystemAPI.HasComponent<QueuedAction>(entity))
 			{
-				var action = SystemAPI.GetComponent<QueuedAction>(entity);
+				QueuedAction action = SystemAPI.GetComponent<QueuedAction>(entity);
 				bool isPathfinding = SystemAPI.HasComponent<ActionPathfind>(entity);
 
 				if (!SystemAPI.HasComponent<NPC>(action.InteractionObject))
@@ -67,15 +63,19 @@ public partial struct NPCSelectedUISystem : ISystem
 				else
 					interactableName = "NPC #" + action.InteractionObject.Index;
 
+				if (SystemAPI.HasComponent<SocialRequest>(entity))
+				{
+					goal = "Being interacted with";
+				}else
 				// Either moving to the object or performing the action
 				if (isPathfinding)
 				{
 					var pathfind = SystemAPI.GetComponent<ActionPathfind>(entity);
-					var socialRequest = SystemAPI.HasComponent<SocialRequest>(entity);
+					var objectSocialRequest = SystemAPI.HasComponent<SocialRequest>(action.InteractionObject);
+					var objectInUse = SystemAPI.HasComponent<InUseTag>(action.InteractionObject);
 					if (pathfind.DestinationReached)
 					{
-						if (!socialRequest)
-							goal = string.Format("Waiting for {0} to be free", interactableName);
+						if (objectSocialRequest || objectInUse) goal = string.Format("Waiting for {0} to be free", interactableName);
 					}
 					else
 						goal = string.Format("Moving to {0}", interactableName);
